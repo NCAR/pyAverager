@@ -170,6 +170,9 @@ o	split_orig_size:  list of  lat/lon names and their original full size DEFAULT 
 o	varlist: [‘a’,’list’,’of’,’vars’,’to’,’avg’]   DEFAULT = Full list
 
 
+Can be created as a dependency? option:
+The averages that are listed in the above table as being able to create averages as dependencies have the ability to use previously calculated averages to calculate a new average.  To use this option, append ‘dep_’ in front of the average name (ie, ‘dep_jja’).  Without ‘dep_’, a jja average would loop over all June, July, and August values within the year ranges and create an average.  With ‘dep_’, the PyAverager will create and output a June average, July average, and August average.  Then it will open these average files and average these values to create the ‘jja’ average file.  In most cases, it is faster to run with ‘dep_’, but it should be pointed out that the answers between using and not using the ‘dep_’ option will differ due to order of operation.
+
 ======================
 PyAverager Error Codes
 ======================
