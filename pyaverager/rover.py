@@ -109,9 +109,9 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
 		((previous_year == date["year1"]) and (previous_month == (date["month1"] - 1)))):
                 previous_year = date["year2"]
                 previous_month = date["month2"]
-            else:
-                print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
-                sys.exit(22)
+            #else:
+            #    print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
+            #    sys.exit(22)
     # Create date/slice lookup table
     hist_dict = {}
     for yr in years:
