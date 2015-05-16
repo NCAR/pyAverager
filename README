@@ -49,7 +49,7 @@ Add (before @default):
 @PyNGL-1.4.0-anaconda
 +mpich2-1.4.1p1
 +anaconda
-Execute ‘resoft’
+Execute resoft
 
 edison.nersc.gov:
 Follow the Yellowstone instructions, but load:
@@ -62,18 +62,18 @@ Add /global/u1/m/mickelso/python_libs/lib/python2.7/site-packages/PyNIO/ to your
 Building and Installing the PyAverager
 ======================================
 
-•	Check out the source code: svn co https://subversion.ucar.edu/asap/pyAverager/tags/v0.9.0
+Check out the source code: svn co https://proxy.subversion.ucar.edu/pubasap/pyAverager/tags/v0.9.0/ 
 
-•	Change into the top-level source code directory and run the Python setup
+Change into the top-level source code directory and run the Python setup
 o	$   cd PyAverager
 o	$   python setup.py install --user
 
-•	Make sure the install location is added to your $PYTHONPATH
+Make sure the install location is added to your $PYTHONPATH
 o	You can also type python to get the interactive terminal and then type
 from pyaverager import PyAverager, specification
 You will get an error if it is not in your path
 
-•	To install documentation, run:
+To install documentation, run:
 o	$   doxygen Doxyfile  
 The documentation will be created in the apidocs directory.
 
@@ -89,7 +89,7 @@ o	Open runAvg_mpi.csh for editing
 o	Set the correct project number to run under
 o	Select an example to run (control_*.py)
 o	Edit the control_*.py script you would like to run
-(See the ‘Specifier’ section below for more details on editing the control script)
+(See the Specifier section below for more details on editing the control script)
 o	Run 
 o	$   bsub < runAvg_mpi.csh
 
