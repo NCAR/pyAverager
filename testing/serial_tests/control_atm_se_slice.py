@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 from pyaverager import PyAverager, specification
+import os
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/lnd/hist/'
-out_dir= '/glade/scratch/mickelso/averager_sandbox/results/lnd/slice/'
-pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.clm2.h0'
+in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/atm/hist/'
+out_dir= os.environ.get('RESULTS_DIR')+'/atm_se/slice/'
+pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cam.h0'
 htype= 'slice'
-average= ['dep_ann:1:10','dep_mam:1:10','dep_jja:1:10','dep_son:1:10','annall:1:10']
+average= ['dep_mam:1:10','jan:1:10']
 wght= True
 ncfrmt = 'netcdf'
-serial=False
+serial=True
 suffix = 'nc'
 clobber = True
 date_pattern= 'yyyymm-yyyymm'

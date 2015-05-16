@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 from pyaverager import PyAverager, specification
+import os
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/lnd/hist/'
-out_dir= '/glade/scratch/mickelso/averager_sandbox/results/lnd/slice/'
-pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.clm2.h0'
-htype= 'slice'
-average= ['dep_ann:1:10','dep_mam:1:10','dep_jja:1:10','dep_son:1:10','annall:1:10']
+in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/atm/mon/tseries/'
+out_dir= os.environ.get('RESULTS_DIR')+'/atm_se/series/'
+pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cam.h0'
+htype= 'series'
+average= ['ann:1:10','mam:1:10','jja:1:10','son:1:10']
 wght= True
 ncfrmt = 'netcdf'
 serial=False

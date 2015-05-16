@@ -1,3 +1,6 @@
 # __init__.py
 
-__version__ = "0.1.0"
+import PyAverager, specification
+
+__version__ = "0.9.0"
+

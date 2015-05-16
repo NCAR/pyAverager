@@ -15,7 +15,7 @@ Created on November 20, 2014
 #
 #==============================================================================
 
-def open_file(var, month_dict, split):
+def open_file(var, month_dict, split, mess='None'):
 
     '''
     Open the original time series or time slice file one at a time
@@ -25,26 +25,41 @@ def open_file(var, month_dict, split):
     @param month_dict   A dictionary that contains all file references for that year.
 
     @param split        Look to see if the there is a split name in the file.
+  
+    @param mess         Optional:  To print an open message.
 
     @return my_file     Returns a file pointer to the newly opened file.
     '''
     # Parse the filename and datestamp out of the 
-    i_prefix = month_dict['fn']
-    date_stamp = month_dict['date_stamp']
-    # check to see if the file name has a variable name in it and set accordingly
-    i_fn = month_dict['fn']
+    #i_prefix = month_dict['fn']
+    #date_stamp = month_dict['date_stamp']
+    i_fn = month_dict['directory']+'/'+month_dict['fn']
     if not (os.path.isfile(i_fn)):
-        i_fn = i_prefix+"."+date_stamp+".nc"
+        i_fn = month_dict['fn']
         if not (os.path.isfile(i_fn)):
-            i_fn = i_prefix+"."+var+"."+date_stamp+".nc"
+            i_fn = month_dict['directory']+'/'
+            for p in month_dict['pattern']:
+                if p == '$prefix':
+                    i_fn = i_fn + month_dict['fn']
+                elif p == '$var':
+                    i_fn = i_fn + var
+                elif p == '$date_pattern':
+                    i_fn = i_fn + month_dict['date_stamp']
+                elif p == '$hem':
+                    i_fn = i_fn + split
+                elif p == '$suffix':
+                    i_fn = i_fn + month_dict['suffix']
+                else:
+                    i_fn = i_fn + p
             if not (os.path.isfile(i_fn)):
-                i_fn = i_prefix+"."+var+"_"+split+"."+date_stamp+".nc"
-                if not (os.path.isfile(i_fn)):
-                    print("ERROR: Cannot find ",i_prefix,"*",date_stamp,".nc.  Exiting.")  
-                    sys.exit(20)
-    # Open the original netcdf file 
+                print("ERROR: Cannot find ",i_fn,".  Exiting.") 
+                sys.exit(20) 
+    # Open the original netcdf file
+    if ('None' not in mess):
+        print 'Opening: ',mess, i_fn
     my_file = Nio.open_file(i_fn,"r")
     return my_file
+
 
 def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend):
 
@@ -118,13 +133,34 @@ def close_all_files(open_list):
     for f in open_list:
         Nio.close(f)    
 
+def open_file_return_var(fn, var):
+
+    '''
+    Opens a netCDF file and returns the full variable. 
+
+    @params fn       The netCDF filename to open.
+
+    @params var      The netCDF variable to get values for.
+
+    @return var_val  The values for the netCDF variable.
+    '''
+
+    # Open the original netcdf file 
+    my_file = Nio.open_file(fn,"r")
+
+    # Get variable
+    var_hndl = my_file.variables[var]
+    var_val = var_hndl[:]
+
+    return var_val
+
 #==============================================================================
 #
 # Functions to create and define a new necdf file
 #
 #==============================================================================
 
-def get_out_fn(ave_type, prefix, date, suffix):
+def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
     
     '''
     Puts together the correct output/average filename.
@@ -137,6 +173,8 @@ def get_out_fn(ave_type, prefix, date, suffix):
 
     @param suffix         The suffix to be appended to the end of the output/average file.
 
+    @param reg		  Used by regional averages.  If not a regional average, -99 is passed
+
     @return outfile_name  The output/average filename.
     '''
     if (ave_type == 'ya'):
@@ -145,6 +183,10 @@ def get_out_fn(ave_type, prefix, date, suffix):
         outfile_name = ave_type+"."+date+"."+suffix
     elif(ave_type == 'mavg'):
         outfile_name = ave_type+"."+date+"."+suffix
+    elif(ave_type == 'hor.meanyr'):
+        outfile_name = reg+'_'+ave_type+"."+date+"."+suffix
+    elif(ave_type == 'hor.meanConcat'):
+        outfile_name = reg+'_hor_mean_'+ave_type+"."+prefix+"_"+date+"."+suffix
     else:
         outfile_name = prefix+"_"+suffix
 
@@ -251,7 +293,7 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
 
     return temp
 
-def get_var_info(my_file, var_name):
+def get_var_info(my_file, var_name, ave_descr):
 
     '''
     Gets the variable information that is needed for the rank to pass this
@@ -274,11 +316,16 @@ def get_var_info(my_file, var_name):
 
     dimnames = []
     for dimn in var_hndl.dimensions:
-        dimnames.append(dimn)
+        if('preproc' in ave_descr):
+            if (my_file.unlimited(dimn)):
+                dimnames.append(dimn)
+        else:
+            dimnames.append(dimn)
     return typeCode,dimnames,var_hndl.attributes
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
-                        outfile,comm,split,split_name,out_dir,messenger,nc_formt,month,key):
+                        outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
+			pre_proc_attr=None, pre_proc_variables=None):
 
     '''
     The function controls the defining of a new NetCDF file.
@@ -303,15 +350,13 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
 
     @param outfile       Full name of the output/averaged file.
 
-    @param comm	         The communicator that is performing this average.
-
     @param split         Boolean, if input file is split spacially.
 
     @param split_name    File name indicator for spatially split files.
 
     @param out_dir       Directory to create the NetCDF in.
 
-    @param messenger     Class that controls the MPI communication.
+    @param simplecomm    Class that controls the MPI communication.
 
     @param nc_formt      File format for the output/average file.
 
@@ -320,10 +365,20 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
     @param key           A variable to use that has a specific file attached to that name.
                          Used as the file to retreive meta data from. 
 
+    @param clobber       Boolean to remove an already existing average file.
+
+    @param firstYr       The first year in the average range.
+
+    @param pre_proc_attr  Optional: used in the pre_proc calculations to specify specific attributes to use.
+
+    @param pre_proc_variable Optional:  (used in the pre_proc calculations) variable names that need to be created.
+
     @return all_files_vars  All of the variable pointers.
 
     @return new_file        Pointer to the new output file.
     '''
+    VAR_INFO_TAG = 30
+
     my_file = {}
     all_files_vars = {}
     new_file = 'null'
@@ -336,14 +391,30 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         first_fn = var_list[0]
         if ('__meta' in first_fn):
              first_fn = key 
+        if ('preproc' in ave_descr):
+            vn_split = first_fn.split('_')
+            if ('ext' in vn_split[0] or 'ai' in vn_split[0]):
+                first_fn = 'aice'
+            else:
+                first_fn = vn_split[0][1:]
 
-        my_file[first_fn] = open_file(first_fn, hist_dict[yr][month],split_name)
+        if hist_type == 'slice' and '__d' not in ave_descr:
+            my_file[first_fn] = open_file(first_fn, hist_dict[firstYr][0],split_name)
+        else:
+            my_file[first_fn] = open_file(first_fn, hist_dict[yr][month],split_name)
         year_slice = yr
-        if split:
+        if split and 'preproc' not in ave_descr:
             new_file_name = out_dir+"/"+split_name+"_"+outfile
         else:
             new_file_name = out_dir+"/"+outfile
         hist_string = time.strftime("%c")+': pyAverager ' + ':'.join(ave_descr) + ' ' + prefix +'* ' + outfile
+        if os.path.isfile(new_file_name):
+            if (clobber):
+                print 'Removing older version of:',new_file_name
+                os.remove(new_file_name)
+            else:
+                print 'ERROR: ',new_file_name,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
+                sys.exit(40) 
         new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt)
         # Add meta variables
         temp = {}
@@ -356,25 +427,55 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         f = open_file(lvar_list[0], hist_dict[yr][month],split_name)
     for orig_var_name in lvar_list:
         if ('__meta' in orig_var_name):
-            var_name = key 
+            var_fn = key 
         else:
-            var_name = orig_var_name
+            var_fn = orig_var_name
+        if ('hor.meanConcat' in ave_descr or 'preproc' in ave_descr):
+            vn_split = var_fn.split('_')
+            if ('preproc' in ave_descr):
+                if ('ext' in vn_split[0]):
+                    lookup_vn = vn_split[0]
+                    unit_var = vn_split[0]
+                else:
+                    lookup_vn = vn_split[0][1:]
+                    unit_var = vn_split[0][1:]
+                write_var = orig_var_name
+                var_fn = vn_split[0][1:]
+            else:
+                lookup_vn = vn_split[0]
+                write_var = orig_var_name
+            if ('ext' in lookup_vn or 'ai' in lookup_vn):
+                lookup_vn = 'aice'
+                var_fn = 'aice'
+        else:
+            lookup_vn = var_fn
+            write_var = orig_var_name
         if (hist_type == 'series' and (serial or not l_master)): # Open each file because there is only one series variable per file
-            f = open_file(var_name, hist_dict[yr][month],split_name)
+            f = open_file(var_fn, hist_dict[yr][month],split_name)
         if ('__meta' in orig_var_name):
             parts = orig_var_name.split('__')
-            var_name = parts[0] 
-         
+            lookup_vn = parts[0] 
+            write_var = parts[0]        
+ 
         if(serial or not l_master):
-            type_code,dimnames,attr = get_var_info(f,var_name)
-            var_info = {'varname':var_name, 'type_code':type_code, 'dim_names':dimnames, 'attr':attr}
-            messenger.send_var_info(var_info,0,comm)
+            type_code,dimnames,attr = get_var_info(f,lookup_vn,ave_descr)
+            if (pre_proc_attr is not None):
+                pre_proc_attr['units'] = pre_proc_variables[unit_var]['units']
+                attr = pre_proc_attr
+            var_info = {'varname':write_var, 'type_code':type_code, 'dim_names':dimnames, 'attr':attr}
+            if (not serial):
+                simplecomm.collect(data=var_info,tag=VAR_INFO_TAG)
         if (serial or l_master):
-            if not serial:
-                var_info = messenger.recv_var_info(comm)
+            if (not serial):
+                r_rank,var_info = simplecomm.collect(tag=VAR_INFO_TAG)
             temp = {}
             vn = var_info['varname']
-            temp[vn] = create_var(var_info['varname'], var_info['type_code'], var_info['dim_names'], var_info['attr'],new_file)
+            #  Add variable to file.  If vn is 'hor.meanyr', we need to add a _DIFF and _RMS variable per variable in loop.
+            if ('hor.meanyr' in ave_descr):
+                for var in (vn,vn+'_DIFF',vn+'_RMS'):
+                    temp[var] = create_var(var, var_info['type_code'], ['time','z_t'], var_info['attr'],new_file)
+            else:
+                temp[vn] = create_var(var_info['varname'], var_info['type_code'], var_info['dim_names'], var_info['attr'],new_file)
         if (hist_type == 'series' and (serial or not l_master)):
             f.close()
     if (hist_type == 'slice' and (serial or not l_master) and len(lvar_list) > 0):
@@ -413,7 +514,7 @@ def write_meta(temp, var_name, my_file):
         out_meta.assign_value(in_meta.get_value())
 
 
-def write_averages(temp, averages, var_name):
+def write_averages(temp, averages, var_name, index=-99):
 
     '''
     Write a variable within the average file
@@ -424,18 +525,28 @@ def write_averages(temp, averages, var_name):
     @param averages   A numPy array that holds the averaged values.
 
     @param var_name   The variable name that is being written.
-    '''
 
+    @param index      Optional: Insert at a certain time index.
+    '''
+ 
     if (temp[var_name].typecode() == 'i'):
         t = np.long
     else:
         t = np.float32
 
-    if averages.shape:
-       temp[var_name][0] = averages[:].astype(t)
+    if not averages.shape:
+        if (index == -99):
+            temp[var_name][0] = averages.astype(t)
+        else:
+            temp[var_name][index] = averages.astype(t)
     else:
-       temp[var_name][0] = averages.astype(t)
-
+        if 'time' ==  var_name:
+            temp[var_name][0] = averages[0].astype(t)
+        else:
+            if (index == -99):
+                temp[var_name][:] = averages[:].astype(t)
+            else:
+                temp[var_name][index] = averages[:].astype(t)
 
 #==============================================================================
 #

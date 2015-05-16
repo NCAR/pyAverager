@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 from pyaverager import PyAverager, specification
+import os
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/mon/tseries/'
-out_dir= '/glade/scratch/mickelso/averager_sandbox/results/ocn/series/'
+in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/hist/'
+out_dir= os.environ.get('RESULTS_DIR')+'/ocn/slice/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.pop.h'
-htype= 'series'
-average = ['tavg:1:10','mavg:1:10','moc:1:10','mocm:1:10','hor.meanConcat:1:10']
+htype= 'slice'
+average = ['ya:1', 'ya:2', 'ya:3', 'ya:4', 'ya:5', 'ya:6', 'ya:7', 'ya:8', 'ya:9', 'ya:10']
 wght= False
 ncfrmt = 'netcdf'
 serial=False
@@ -22,8 +23,8 @@ obs_dir = '/glade/p/work/mickelso/PyAvg-OMWG-obs/obs/'
 obs_file = 'obs.nc'
 reg_obs_file_suffix = '_hor_mean_obs.nc'
 
-clobber = True
 suffix = 'nc'
+clobber = True
 date_pattern= 'yyyymm-yyyymm'
 
 #### End user modify ####
@@ -47,5 +48,6 @@ pyAveSpecifier = specification.create_specifier(in_directory=in_dir,
                                   obs_dir=obs_dir,
                                   obs_file=obs_file,
                                   reg_obs_file_suffix=reg_obs_file_suffix)
+
 PyAverager.run_pyAverager(pyAveSpecifier)
 

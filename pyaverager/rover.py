@@ -2,7 +2,113 @@ import glob,sys,os
 import Nio
 import time
 
-def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, end_yr, split):
+def fn_split(name_fp, prefix, suffix, split_fn, date_pattern, file_pattern):
+
+    '''
+    Puts together a split filename
+
+    @param name_fp        The filename including path. 
+
+    @param prefix         The prefix that matches the input filenames.
+
+    @param suffix         The suffix that matches the input filenames.
+
+    @param split_fn       The name of the split key.
+
+    @param date_pattern   The pattern of the date string.
+
+    @param file_pattern   The file pattern that matches the input filenames.
+   
+    @return fn_decode     The name of the file.
+
+    '''
+
+    path,name = os.path.split(name_fp)
+
+    hems = split_fn.split(",")
+    index = 0
+    current_pattern = 0
+    passed_prefix = False
+    fn_decode = {}
+    for p in file_pattern:
+        if p[0] == '$':
+            if p=='$prefix':
+                fn_decode['prefix'] = prefix
+                index = len(prefix) + index
+                passed_prefix = True
+            elif p=='$suffix':
+                fn_decode['suffix'] = suffix
+                index = len(suffix) + index
+            elif p=='$hem':
+                for h in hems:
+                    if (file_pattern[current_pattern-1]+h+file_pattern[current_pattern+1]) in name:
+                        fn_decode['hem'] = h
+                        index = len(h) + index     
+            else:
+                if passed_prefix: 
+                    name_loc = [n for (n,e) in enumerate(name[index:]) if e == file_pattern[current_pattern+1]] 
+                else:
+                    no_prefix = name.replace(prefix,'')
+                    name_loc = [n for (n,e) in enumerate(no_prefix[index:]) if e == file_pattern[current_pattern+1]] 
+                similar_left = 0
+                for m in range(current_pattern+1, len(file_pattern)):
+                    if file_pattern[m] == file_pattern[current_pattern+1]:
+                        similar_left = similar_left+1
+                stop_index = name_loc[len(name_loc)-similar_left]+index 
+                value = name[index:stop_index] 
+                fn_decode[p[1:]] = value
+                index = len(value) + index 
+        else:
+            index = len(p) + index
+
+        current_pattern = current_pattern + 1
+
+    return fn_decode
+
+def get_slice_fn(file_pattern, directory, prefix, suffix, stamp):
+
+    '''
+    Puts together a time slice filename
+
+    @param file_pattern   The file pattern that matches the input filenames.
+
+    @param directory      The directory where the input data is located.
+
+    @param prefix         The prefix that matches the input filenames.
+
+    @param suffix         The suffix that matches the input filenames.
+
+    @param stamp          The timestamp that matches the input filename.
+
+    @return filename      The name of the file.
+
+    @return file_prefix   The prefix of the file.
+
+    '''
+
+    filename = ''
+    file_prefix = directory+'/'
+    stop = False
+
+    for p in file_pattern:
+        if p[0] == '$':
+            if p=='$prefix': 
+                filename = filename+prefix
+                if not stop:
+                    file_prefix = file_prefix+prefix
+            if p=='$date_pattern':    
+                filename = filename+stamp
+                stop = True
+            if p=='$suffix':
+                filename = filename+suffix
+        else:
+            filename = filename+p       
+            if not stop:
+                file_prefix = file_prefix+p        
+    
+    return filename,file_prefix
+
+def set_slices_and_vars_time_series(directory, file_pattern, date_pattern, prefix, suffix, start_yr, end_yr, split, split_fn):
 
     '''
     Create a  dictionary lookup based on time series files
@@ -12,13 +118,19 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
 
     @param file_pattern   The file pattern to glob the input directory on.
 
+    @param date_pattern   The pattern for the date string.
+
     @param prefix         The prefix to glob the input directory on.
+
+    @param suffix         The suffix to glob the input directory on.
 
     @param start_yr       The first year that will be needed by the average(s).
 
     @param end_yr         The last year that will be needed by the average(s).
 
     @param split          Boolean, if input files are spit spatially.        
+
+    @param split_fn       The key used to indicate which part of the split.
 
     @return hist_dict     A dictionary that lists all input file references for each
                           year/month needed by all averages.
@@ -41,20 +153,23 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
     end_yr = end_yr + 1
 
     # Glob the directory and get a list of all matching names
-    glob_string = directory+ "/" + prefix + "*.nc"
+    glob_string = directory+ "/"# + prefix + "*.nc"
+    for p in file_pattern:
+        if p =='$prefix':
+            glob_string = glob_string + prefix
+        elif ('$' in p):
+            glob_string = glob_string + '*'
+        else:
+            glob_string = glob_string + p
     file_list = glob.glob(glob_string)
 
     # Foreach of the files, get date strings and get var list
     dates = []
     var_list = []
     for f in file_list:
-        name_parts = f.split(".")
-        np_len = len(name_parts)
-        dates.append(name_parts[np_len-2])
-        if split:
-            var_list.append(name_parts[np_len-3][:-3])
-        else:  
-            var_list.append(name_parts[np_len-3])
+        name_parts = fn_split(f, prefix, suffix, split_fn, date_pattern, file_pattern)
+        dates.append(name_parts['date_pattern'])
+        var_list.append(name_parts['var'])
     # remove duplicates by converting to a set
     date_list = set(dates)
     series_list = set(var_list)
@@ -109,9 +224,9 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
 		((previous_year == date["year1"]) and (previous_month == (date["month1"] - 1)))):
                 previous_year = date["year2"]
                 previous_month = date["month2"]
-            #else:
-            #    print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
-            #    sys.exit(22)
+            else:
+                print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
+                sys.exit(22)
     # Create date/slice lookup table
     hist_dict = {}
     for yr in years:
@@ -128,7 +243,7 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
             yr2 = date_lookup[stamp]["year2"]
             m1 = date_lookup[stamp]["month1"]
             m2 = date_lookup[stamp]["month2"]
-            file_prefix = directory+ "/" + prefix
+            file_prefix = prefix
             
             # Find the start and end months on the files for indexing
             if (yr > yr1 and yr < yr2):
@@ -159,7 +274,7 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
                         else:
                             startIndex = (((yr-yr1)*12)+(m-m1)+1)-1
                     # set the information for this month slice
-                    year_dict[m-1] = {'fn':file_prefix, 'index':startIndex, 'date_stamp':stamp}
+                    year_dict[m-1] = {'directory':directory, 'fn':file_prefix, 'index':startIndex, 'date_stamp':stamp, 'pattern':file_pattern, 'suffix':suffix}
         # Add the year's info to the master dictionary
         hist_dict[yr] = year_dict
 
@@ -170,13 +285,8 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
     # and list should be complete then.
     f = Nio.open_file(file_list[1],"r")
     temp_meta_list = list(f.variables.keys())
-    name_parts = file_list[1].split(".")
-    np_len = len(name_parts)
-    if split:
-        series_var = name_parts[np_len-3][:-3]
-        #print(series_var)
-    else:
-        series_var = name_parts[np_len-3]
+    name_parts = fn_split(file_list[1], prefix, suffix, split_fn, date_pattern, file_pattern)
+    series_var = name_parts['var']
     temp_meta_list.remove(series_var)
 
     # find the unlimited dimesnion
@@ -196,10 +306,11 @@ def set_slices_and_vars_time_series(directory, file_pattern, prefix, start_yr, e
                 series_list.add(var+'__metaChar')
             else:
                 series_list.add(var+'__meta')
+
     return hist_dict,list(series_list),list(meta_list),key
 
 
-def set_slices_and_vars_time_slice(directory, file_pattern, prefix, start_yr, end_yr):
+def set_slices_and_vars_time_slice(directory, file_pattern, prefix, suffix, start_yr, end_yr):
 
     '''
     Create the dictionary to look up slices based on history time slice files
@@ -210,6 +321,8 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, start_yr, en
     @param file_pattern   The file pattern to glob the input directory on.
 
     @param prefix         The prefix to glob the input directory on.
+
+    @param suffix         The suffix to glob the input directory on.
 
     @param start_yr       The first year that will be needed by the average(s).
 
@@ -243,14 +356,15 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, start_yr, en
         for m in months:
             # Check to see if the file exists before adding info to dictionary
             startIndex = 0 # Slice index will always be 1 in history time slice files
-            file_prefix = directory+"/"+prefix
+            #file_prefix = directory+"/"+prefix
             yrS = str(yr)
             mS = str(m)
             stamp = yrS.zfill(4)+"-"+mS.zfill(2)
-            filename = file_prefix+"."+stamp+".nc"
+            filename,file_prefix = get_slice_fn(file_pattern, directory, prefix, suffix, stamp)
+            filename = directory+"/"+filename
             if (os.path.isfile(filename)):
                 # If exists, add it    
-                year_dict[m-1] = {'fn':file_prefix, 'index':startIndex, 'date_stamp':stamp}
+                year_dict[m-1] = {'directory':directory, 'fn':prefix, 'index':startIndex, 'date_stamp':stamp, 'pattern':file_pattern, 'suffix':suffix}
             else:
                 if (yr > yr1 and yr < yr2):
                     print("ERROR: Could not find file: ",filename,"  Exiting.")
@@ -260,7 +374,10 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, start_yr, en
   
     # Grab variable list from a file.
     yrS = str(start_yr).zfill(4)
-    test_file = directory+"/"+prefix+"."+yrS+"-02.nc" 
+    #test_file = directory+"/"+prefix+"."+yrS+"-01.nc" 
+    stamp = yrS+"-01"
+    test_file,file_prefix = get_slice_fn(file_pattern, directory, prefix, suffix, stamp)
+    test_file = directory+'/'+test_file
     f = Nio.open_file(test_file,"r")
     var_list = list(f.variables.keys())
 
@@ -285,7 +402,7 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, start_yr, en
     return hist_dict,series_list,meta_list,key
 
 
-def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr, ave_type, ave):
+def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr, ave_type, ave, region):
 
     '''
     Create the dictionary to look up slices based on history time slice files
@@ -304,6 +421,8 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
     @param ave_type       The average type key that indicated which type of average will be done.
 
     @param ave            The average type name string.
+ 
+    @param region         The string idenitfing the region to calculate over (used in hor.mean* averages).
 
     @return hist_dict     A dictionary that lists all input file references for each
                           year/month needed by all averages.
@@ -331,9 +450,9 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
                 else:
                     glob_string = directory + "/" + prefix + '*' + ave_t.average_types[mon]['fn']
                 file_list = glob.glob(glob_string)
-                year_dict[m] = {'fn': file_list[0], 'index':0, 'date_stamp':mon}
+                year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':mon, 'pattern':None, 'suffix':'.nc'}
             else:
-                year_dict[m] = {'fn': 'null', 'index':0, 'date_stamp':mon}            
+                year_dict[m] = {'directory':directory, 'fn': 'null', 'index':0, 'date_stamp':mon, 'pattern':None, 'suffix':'.nc'}            
             m = m + 1 #increase the month index
         hist_dict[yr] = year_dict
     else:
@@ -344,10 +463,13 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
         for yr in years:
             year_dict = {}    
             yr_fmt = string.zfill(yr,4)
-            glob_string = directory + "/" + prefix + "." + yr_fmt + ".*"
+            if (ave == 'hor.meanConcat'):
+                glob_string = directory + "/" + region + '_hor.meanyr.' +  yr_fmt + ".*"
+            else:
+                glob_string = directory + "/" + prefix + "." + yr_fmt + ".*"
             file_list = glob.glob(glob_string)
             for m in range(0,12):
-                year_dict[m] = {'fn': file_list[0], 'index':0, 'date_stamp':yr_fmt}
+                year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':yr_fmt, 'pattern':None, 'suffix':'.nc'}
             hist_dict[yr] = year_dict
     return hist_dict
 
@@ -391,12 +513,9 @@ def check_if_series_var(f, vn, unlimited):
     else:
         if_variant = False
 
-#    if (var.typecode() == 'S1'):
-#        if_series = False
-#        if_variant = False
     return if_series,if_variant,if_char 
 
-def fetch_slice(hist_dict, yr, month, var, file_dict):
+def fetch_slice(hist_dict, yr, month, var, file_dict, time=True):
 
     '''
     Based on indexing found within the file_dictionary, return the correct data slice
@@ -409,13 +528,18 @@ def fetch_slice(hist_dict, yr, month, var, file_dict):
 
     @param var            The variable to retrv.
 
-    @param file_dict            Dictionary containing file pointers to the open NetCDF files.
+    @param file_dict      Dictionary containing file pointers to the open NetCDF files.
+
+    @param time           A particular index to pull.   
 
     @return var_val       The time slice that was requested in numPy array format.
     '''
 
     var_hndl = file_dict[yr][month]['fp'].variables[var]
-    var_val = var_hndl[hist_dict[yr][month]['index']]
 
+    if (time):
+        var_val = var_hndl[hist_dict[yr][month]['index']]
+    else:
+        var_val = var_hndl[:]
     return var_val
 

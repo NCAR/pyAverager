@@ -2,8 +2,9 @@ import Nio
 import climFileIO
 import numpy as np
 from numpy import ma as MA
+import os
 
-def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim):
+def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim, clobber):
 
     '''
     This function stritches together two spatially split files into one file.  It
@@ -25,6 +26,8 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim)
 
     @param split_dim   The name of the dimension in which the file is split across.
                        Must match the dim name that is in the original split files. 
+
+    @param clobber     Boolean to delete average files if they exist on disk.
     ''' 
     all_files_vars = {}
     temp = {}
@@ -37,6 +40,13 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim)
     size1 = f1.dimensions[split_dim]
     size2 = f2.dimensions[split_dim]
 
+    if os.path.isfile(outfile):
+        if (clobber):
+            print 'Removing older version of:',outfile
+            os.remove(outfile)
+        else:
+            print 'ERROR: ',outfile,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
+            sys.exit(40)
     new_file = Nio.open_file(outfile,"w")
 
     # Define global attributes

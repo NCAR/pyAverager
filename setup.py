@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='PyAverager',
-      version='0.1.0',
+      version='0.9.0',
       description='Parallel Python Averager for Climate Data',
       author='Sheri Mickelson',
       author_email='mickelso@ucar.edu',

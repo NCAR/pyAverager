@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
 from pyaverager import PyAverager, specification
+import os
 
 #### User modify ####
 
 in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/mon/tseries/'
-out_dir= '/glade/scratch/mickelso/averager_sandbox/results/ocn/series/'
+out_dir= os.environ.get('RESULTS_DIR')+'/ocn/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.pop.h'
 htype= 'series'
 average = ['tavg:1:10','mavg:1:10','moc:1:10','mocm:1:10','hor.meanConcat:1:10']
 wght= False
 ncfrmt = 'netcdf'
-serial=False
+serial=True
 
-var_list = ['TEMP', 'SALT']
+var_list = ['TEMP','SALT']
 mean_diff_rms_obs_dir = '/glade/p/work/mickelso/PyAvg-OMWG-obs/obs/'
 region_nc_var = 'REGION_MASK'
 regions={1:'Sou',2:'Pac',3:'Ind',6:'Atl',8:'Lab',9:'Gin',10:'Arc',11:'Hud',0:'Glo'}

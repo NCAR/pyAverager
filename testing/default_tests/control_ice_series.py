@@ -2,15 +2,16 @@
 
 from pyaverager import PyAverager, specification
 import PreProc
+import os
 
 #### User modify ####
 
 in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ice/mon/tseries/'
-out_dir= '/glade/scratch/mickelso/averager_sandbox/results/ice/series/'
+out_dir= os.environ.get('RESULTS_DIR')+'/ice/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cice.h'
 htype= 'series'
 average= ['ya:1', 'ya:2', 'ya:3', 'ya:4', 'ya:5', 'ya:6', 'ya:7', 'ya:8', 'ya:9', 'ya:10',
-            'jfm:1:10','fm:1:10','amj:1:10','jas:1:10','ond:1:10','on:1:10']
+            'dep_jfm:1:10','dep_fm:1:10','dep_amj:1:10','dep_jas:1:10','dep_ond:1:10','dep_on:1:10']
 wght= False
 spl= True
 split_fn= 'nh,sh'
