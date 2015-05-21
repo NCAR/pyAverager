@@ -9,7 +9,7 @@ PyAverager
 A package used for computing averages from climate model output.
 
 Authors:  Sheri Mickelson, Kevin Paul, and John Dennis
-Version:  0.9.0
+Version:  0.9.1
 Copyright:  Contained within LICENSE.txt
 Comments and feedback:  mickelso@ucar.edu
 
@@ -35,12 +35,11 @@ PyTools: https://www2.cisl.ucar.edu/tdd/asap/parallel-python-tools-post-processi
 CESM Supported Machine Information (steps to take to get these packages into your path):
 
 Yellowstone:
-Add the following to the top of your bsub script or execute them on the command line and then type ‘module save’ to always keep them in your environment:
+Add the following to the top of your bsub script or execute them on the command line and then type module save to always keep them in your environment:
 module load python 
 module load all-python-libs
-Download the PyTools package (see above for link)
-cd into PyTools
-$   python setup.py install --user
+module load asaptools
+(If asaptools fails to load, it has since been added to all-python-libs module)
 
 tukey.alcf.anl.gov:
 Edit your $HOME/.soft.tukey file
@@ -50,6 +49,7 @@ Add (before @default):
 +mpich2-1.4.1p1
 +anaconda
 Execute resoft
+See below to install ASAP PyTools
 
 edison.nersc.gov:
 Follow the Yellowstone instructions, but load:
@@ -57,14 +57,23 @@ module load python_base/2.7.3
 module load mpi4py/1.3.1
 module load numpy
 Add /global/u1/m/mickelso/python_libs/lib/python2.7/site-packages/PyNIO/ to your PYTHONPATH env variable
+See below to install ASAP PyTools
+
+How To Install ASAP PyTools
+- git clone https://github.com/NCAR-CISL-ASAP/ASAPPyTools pytools
+- cd into pytools
+- python setup.py install --user
 
 ======================================
 Building and Installing the PyAverager
 ======================================
 
-Check out the source code: svn co https://proxy.subversion.ucar.edu/pubasap/pyAverager/tags/v0.9.0/ 
+Check out the source code (3 options): 
+- svn co https://proxy.subversion.ucar.edu/pubasap/pyAverager/tags/v0.9.1/
+- git clone https://github.com/sherimickelson/pyAverager
+- pip install pyAverager --user 
 
-Change into the top-level source code directory and run the Python setup
+If checking out the code via svn or git, you must install the pyAverager (the pip method will install the package for you).
 o	$   cd PyAverager
 o	$   python setup.py install --user
 
@@ -97,7 +106,7 @@ o	$   bsub < runAvg_mpi.csh
 Specification
 ======================================
 
-The PyAverager is a python library that is referenced from another python script.  In order to run the PyAverager, you need to specify parameters so the average knows what types of averages to compute, input/output locations, and any averaging options you would like to add.  The ‘example’ directory contains several ‘control_.py’ files that you can use as templates.  You can copy one of these scripts and modify the top section to fit your data.
+The PyAverager is a python library that is referenced from another python script.  In order to run the PyAverager, you need to specify parameters so the average knows what types of averages to compute, input/output locations, and any averaging options you would like to add.  The example directory contains several control_.py files that you can use as templates.  You can copy one of these scripts and modify the top section to fit your data.
 
 CESM naming conventions that the PyAverager follows by default:
 
@@ -155,7 +164,7 @@ preproc	        Ice pre proc file	        ice_vol$CASE_$Year1-$Year2.nc	   Not N
 ======================================
 Can be created as a dependency? option:
 ======================================
-The averages that are listed in the above table as being able to create averages as dependencies have the ability to use previously calculated averages to calculate a new average.  To use this option, append ‘dep_’ in front of the average name (ie, ‘dep_jja’).  Without ‘dep_’, a jja average would loop over all June, July, and August values within the year ranges and create an average.  With ‘dep_’, the PyAverager will create and output a June average, July average, and August average.  Then it will open these average files and average these values to create the ‘jja’ average file.  In most cases, it is faster to run with ‘dep_’, but it should be pointed out that the answers between using and not using the ‘dep_’ option will differ due to order of operation.
+The averages that are listed in the above table as being able to create averages as dependencies have the ability to use previously calculated averages to calculate a new average.  To use this option, append dep_ in front of the average name (ie, dep_jja).  Without dep_, a jja average would loop over all June, July, and August values within the year ranges and create an average.  With dep_, the PyAverager will create and output a June average, July average, and August average.  Then it will open these average files and average these values to create the jja average file.  In most cases, it is faster to run with dep_, but it should be pointed out that the answers between using and not using the dep_ option will differ due to order of operation.
 
 ======================================
 Specifier Arguements
@@ -171,7 +180,7 @@ o	prefix:  the case name, plus component name (ie. b40.20th.track1.1deg.006.cam2
 o	suffix:  the end of the input file names (usually nc)
 o	date_pattern: 'yyyymm-yyyymm'
 o	avg_list: a list of averages to compute   DEFAULT = Empty List
-Format:   [‘ya:1850’,’mavg:1850:1890’]  ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table. 
+Format:   ['ya:1850','mavg:1850:1890']  ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table. 
 
 ===
 Variables that are mandatory for the Ice and Ocean Diags:
@@ -197,24 +206,80 @@ o	ncformat: either 'netcdf4c' (netcdf4 compressed (lev=1)), 'netcdf4' (netcdf cl
 o	file_pattern: needed for non-cesm data
 For file name: tasmax_Amon_GFDL-FLORB01_FLORB01-P1-ECDA-v3.1-011980_r10i1p1_198001-198012.nc
 Use: ['$var','_','$prefix','_','$m_id','_','$date_pattern','.','$suffix']
-o	hist_type: either ‘slice’ or ‘series’   DEFAULT = 'slice'
+o	hist_type: either slice or series   DEFAULT = 'slice'
 o	m_id: experiment/or other unique id (can be used to id ensemble members)
 o	weighted: Boolean to weight averages (when available, see about table)  DEFAULT = False
 o	split:  Are the files split between lat coordinates (used in cice series files)
 DEFAULT = False
-o	split_files: strings differentiating the different pieces   DEFAULT = ‘null’
-o	split_orig_size:  list of  lat/lon names and their original full size DEFAULT = ‘null’
-o	varlist: [‘a’,’list’,’of’,’vars’,’to’,’avg’]   DEFAULT = Full list
+o	split_files: strings differentiating the different pieces   DEFAULT = null
+o	split_orig_size:  list of  lat/lon names and their original full size DEFAULT = null
+o	varlist: ['a','list','of','vars','to','avg']   DEFAULT = Full list
 o	clobber:  If a user specified average exists on disk, delete if set to true.  DEFAULT=False
 o	serial:  run in serial or parallel mode DEFAULT=FALSE (parallel mode)
-o	main_comm:  the simple_comm object.  If one isn’t passed in, one will be initialized for you.
+o	main_comm:  the simple_comm object.  If one isnt passed in, one will be initialized for you.
+
+======================================
+To generate the obs file needed for the Ocean hor.meandiff calculation:
+(or yellowstone users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
+======================================
+Required: 
+- From omwg obs_data: 
+  PHC2_TEMP_gx1v6_ann_avg.nc and SALT PHC2_SALT_gx1v6_ann_avg.nc
+- POP history file
+Directions:
+- Copy PHC2_TEMP_gx1v6_ann_avg.nc to obs.nc
+- ncks -A -v SALT PHC2_SALT_gx1v6_ann_avg.nc obs.nc
+- ncks -A -v TAREA,REGION_MASK a_pop_history_file.nc obs.nc
+- ncrename -O -d X,nlon -d Y,nlat -d depth,z_t obs.nc
+- ncatted -a _FillValue,TEMP,c,f,-99. obs.nc
+- ncatted -a _FillValue,SALT,c,f,-99. obs.nc
+- ncatted -a missing_value,TLAT,d,, obs.nc
+- ncatted -a missing_value,TLONG,d,, obs.nc
+- ncatted -a _FillValue,TLAT,d,, obs.nc
+- ncatted -a _FillValue,TLONG,d,, obs.nc
+- ncatted -a _FillValue,TAREA,c,f,-99. obs.nc
+- ncatted -a _FillValue,TAREA,m,f,1.0e36 obs.nc
+- ncatted -a _FillValue,TAREA,m,f,-99 obs.nc
+- ncatted -a _FillValue,,m,f,-99 obs.nc
+- ncatted -a _FillValue,TAREA,m,f,-99 obs.nc
+- ncatted -a _FillValue,TAREA,o,f,-99 obs.nc
+- ncatted -a _FillValue,REGION_MASK,o,i,99 obs.nc
+
+======================================
+To generate the regional obs files needed for the Ocean hor.meandiff calculation:
+(or yellowstone users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
+======================================
+Required: 
+- From omwg obs_data: 
+  PHC2_TEMP_gx1v6_ann_avg.nc and SALT PHC2_SALT_gx1v6_ann_avg.nc
+- POP history file
+Directions:
+- Copy PHC2_TEMP_gx1v6_ann_avg.nc to obs.nc
+- ncks -A -v SALT PHC2_SALT_gx1v6_ann_avg.nc obs.nc
+- ncks -A -v TAREA,REGION_MASK a_pop_history_file.nc obs.nc
+- ncrename -O -d X,nlon -d Y,nlat -d depth,z_t obs.nc
+- ncatted -a _FillValue,TEMP,c,f,-99. obs.nc
+- ncatted -a _FillValue,SALT,c,f,-99. obs.nc
+- ncatted -a missing_value,TLAT,d,, obs.nc
+- ncatted -a missing_value,TLONG,d,, obs.nc
+- ncatted -a _FillValue,TLAT,d,, obs.nc
+- ncatted -a _FillValue,TLONG,d,, obs.nc
+- For regions in the table below: 
+	o	ncwa -m REGION_MASK -T eq -M <reg_number> -w TAREA -a nlon,nlat -v TEMP,SALT obs.nc <reg>_hor_mean_obs.nc
+	o	<reg_number> Table
+		Sou	Pac	Ind	Atl	Lab	Gin	Arc	Hud
+		1	2	3	6	8	9	10	11
+
+- For Glo:
+	o	ncwa -m REGION_MASK -T gt -M 0 -w TAREA -a nlon,nlat -v TEMP,SALT obs.nc Glo_hor_mean_obs.nc
+
 
 ======================================
 PyAverager Error Codes
 ======================================
 errors 1-19:  average list errors
 1: Listed average is not in the know average list
-2: Average cannot be created with depndencies
+2: Average cannot be created with dependencies
 3: Average must list only one year
 4: Average must have a start year and an end year
 5: Date ranges are inconsistent and cannot run this average with dependencies

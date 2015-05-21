@@ -137,7 +137,7 @@ class PyAverager(object):
 		# Each intercommunicator recieves a list of averages it's responsible for
 		# Each mpi task within that intercommunicator gets a portion of the variable list 
      		num_of_avg = len(avg_dict[i])
-		min_procs_per_ave = 4
+		min_procs_per_ave = min(4,spec.main_comm.get_size())
 
 		# Override user selection if they picked less than 2 or
 		# the variable list is less than the min procs per sub-communicator
