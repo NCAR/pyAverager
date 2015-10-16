@@ -235,13 +235,13 @@ class pyAveragerSpecifier(Specifier):
     for avg in avg_list:
       avg_descr = avg.split(':')
       for yr in avg_descr[1:]:
-        dates.append(yr)
+        dates.append(int(yr))
     if (year0 == -99 and year1 == -99):
         self.year0 = int(min(dates))
         self.year1 = int(max(dates)) 
     else:
-        self.year0 = year0
-        self.year1 = year1     
+        self.year0 = int(year0)
+        self.year1 = int(year1)     
 
     # Initialize a simple_comm object if one was not passed in by the user
     if (main_comm is None):

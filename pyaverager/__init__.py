@@ -1,6 +1,6 @@
 # __init__.py
 
-import PyAverager, specification
+import PyAverager, specification, PreProc
 
-__version__ = "0.9.1"
+__version__ = "0.9.2"
 

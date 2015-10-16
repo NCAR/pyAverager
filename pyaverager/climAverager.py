@@ -4,7 +4,7 @@ import rover
 import climFileIO
 from numpy import ma as MA
 
-def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
+def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
 
     '''
     Computes the average of a variable
@@ -28,6 +28,8 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
 
     @param depend      Boolean variable to indicate if this average will be computed from previously calculated files. 
  
+    @param fyr         The first year of average series
+
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
     print('Computing ',ave_info['type'],' for ',var," for ",years)
@@ -42,7 +44,7 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
     # with a mask accumulator
     if hasattr(sample_month['fp'].variables[var],'_FillValue'):
         fillValue = getattr(sample_month['fp'].variables[var],'_FillValue')
-        var_Ave = avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend)
+        var_Ave = avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend,fyr)
     else:
         # Create average by creating a running sum and then divide by the count
         count = 0
@@ -52,7 +54,7 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
             # Check if doing a winter average and get the correct year to pull
                 if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan' 
 		    or ave_type == 'next_feb' or ave_type == 'prev_dec'):
-                    pull_year = climFileIO.which_winter_year(hist_dict, m, yr, years[0])
+                    pull_year = climFileIO.which_winter_year(hist_dict, m, yr,fyr)
                 else:
                     pull_year = yr
                 timer.start("Variable fetch time")
@@ -71,7 +73,7 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
 
     return var_Ave
 
-def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend):
+def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend,fyr):
 
     '''
     Computes the average of a variable that contains missing values
@@ -97,6 +99,8 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
 
     @param depend      Boolean variable to indicate if this average will be computed from previously calculated files.
 
+    @param fyr         The first year of average series
+
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
     # if variable contains missing values, create a mask accumulator that will count how many masked values not to add & divide
@@ -111,7 +115,7 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
             # Check if doing a winter average and get the correct year to pull
             if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
-                pull_year = climFileIO.which_winter_year(hist_dict, m, yr,years[0])
+                pull_year = climFileIO.which_winter_year(hist_dict, m, yr,fyr)
             else:
                 pull_year = yr
             var_val = rover.fetch_slice(hist_dict,pull_year,m,var,file_dict)
@@ -149,7 +153,7 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
 
     return var_Ave
 
-def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend):
+def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
 
     '''
     Computes the weighted average of a variable
@@ -173,6 +177,8 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
 
     @param depend      Boolean variable to indicate if this average will be computed from previously calculated files.
 
+    @param fyr         The first year of average series
+
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
     print('Computing weighted ',ave_info['type'],' for ',var," for ",years)
@@ -189,9 +195,9 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
     # If the variable has missing values, we need to calculate the average differently
     if hasattr(sample_month['fp'].variables[var],'_FillValue'):
         fillValue = getattr(sample_month['fp'].variables[var],'_FillValue')
-        var_Ave = weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend)
+        var_Ave = weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend,fyr)
     else:
- 
+        d_in_m = [31,28,31,30,31,30,31,31,30,31,30,31] 
         # Create the sum of all slices
         for yr in years:
             i = 0
@@ -200,26 +206,35 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
                 # Check if doing a winter average and get the correct year to pull
                 if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
-                    pull_year = climFileIO.which_winter_year(hist_dict, m, yr,years[0])
+                    pull_year = climFileIO.which_winter_year(hist_dict, m, yr,fyr)
                 else:
                     pull_year = yr
                 var_val = rover.fetch_slice(hist_dict,pull_year,m,var,file_dict)
                 timer.stop("Variable fetch time")
                 if (first):
-                    var_sum = (var_val*ave_info['weights'][i])
+                    if (ave_type == 'ya'):
+                        var_sum = (var_val*d_in_m[m])
+                    else:
+                        var_sum = (var_val*ave_info['weights'][i])
                     first = False
                 else:
-                    var_sum = (var_val*ave_info['weights'][i]) + var_sum
+                    if (ave_type == 'ya'):
+                        var_sum = (var_val*d_in_m[m]) + var_sum
+                    else:
+                        var_sum = (var_val*ave_info['weights'][i]) + var_sum
                 i+=1
             count+=1
         # Since the weights are only for 1 year, divide by total number of years
-        var_Ave = np.divide(var_sum,count)
+        if (ave_type == 'ya'):
+            var_Ave = var_sum * (1/365.)
+        else:
+            var_Ave = np.divide(var_sum,count)
 
     timer.stop("Time to compute Average")
 
     return var_Ave
 
-def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend):
+def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend,fyr):
 
     '''
     Computes the average of a variable that contains missing values
@@ -245,6 +260,8 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
 
     @param depend      Boolean variable to indicate if this average will be computed from previously calculated files.
 
+    @param fyr         The first year of average series
+
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
     # if variable contains missing values, create a mask accumulator that will count how many masked values not to add & divide
@@ -253,6 +270,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
     fetch_time = 0
 
     first_mask = True
+    d_in_m = [31,28,31,30,31,30,31,31,30,31,30,31]
     for yr in years:
         i = 0
         for m in ave_info['months_to_average']:
@@ -260,7 +278,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
             # Check if doing a winter average and get the correct year to pull
             if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
-                pull_year = climFileIO.which_winter_year(hist_dict, m, yr,years[0])
+                pull_year = climFileIO.which_winter_year(hist_dict, m, yr,fyr)
             else:
                 pull_year = yr
             var_val = rover.fetch_slice(hist_dict,pull_year,m,var,file_dict)
@@ -275,14 +293,23 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
                 if (MA.any(MA.getmask(var_val))):
                     mask_sum = mask_sum + (MA.getmask(var_val)).astype(int)
             if (first):
-                var_sum = (var_val*ave_info['weights'][i])
+                if (ave_type == 'ya'):
+                    var_sum = (var_val*d_in_m[m])
+                else:
+                    var_sum = (var_val*ave_info['weights'][i])
                 first = False
             else:
-                var_sum = (var_val*ave_info['weights'][i]) + var_sum
+                if (ave_type == 'ya'):
+                     var_sum = (var_val*d_in_m[m]) + var_sum
+                else:
+                    var_sum = (var_val*ave_info['weights'][i]) + var_sum
             i+=1
         count+=1
     # Since the weights are only for 1 year, divide by total number of years
-    var_Ave = np.divide(var_sum,count)
+    if (ave_type == 'ya'):
+        var_Ave = var_sum * (1/365.)
+    else:
+        var_Ave = np.divide(var_sum,count)
     # If any values are 0, then replace the var_Ave value with the fill value
     if (first_mask != True):
         var_Ave[mask_sum>0]=fillValue 
@@ -578,11 +605,15 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
                 if not serial:
                     r_rank,results = simplecomm.collect(tag=CONCAT_TAG)
                     var_val = results['average']
+                    if results['dtype'] == 'S1':
+                        var_val = var_val[0]
                     var_n = results['name']
                     ti = results['index']
                 else:
                     var_n = var
                     ti = time_index
+                    if var_val.dtype == 'S1':
+                        var_val = var_val[0]
                 climFileIO.write_averages(all_files_vars, var_val, var_n, index=ti) 
             time_index = time_index + 1
 

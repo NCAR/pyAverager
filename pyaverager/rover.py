@@ -301,6 +301,8 @@ def set_slices_and_vars_time_series(directory, file_pattern, date_pattern, prefi
         if_series,if_variant,if_char = check_if_series_var(f,var,unlimited)
         if (if_series == False and if_variant == False):
             meta_list.append(var)
+        elif (var in unlimited):
+            series_list.add(var+'__meta')
         else:
             if if_char:
                 series_list.add(var+'__metaChar')
@@ -394,8 +396,10 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, suffix, star
         if (if_series == False and if_variant == False):
             meta_list.append(var)
         elif (if_series == True and if_variant == True):
-           series_list.append(var)
-    
+           if (var in unlimited):
+               series_list.append(var+'__meta')
+           else:
+               series_list.append(var)
     f.close()
     key = series_list[0]
 
@@ -442,13 +446,13 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
         yr = int(start_yr)
         for mon in months_in_year:
             if (mon in ave_type['depend']):
-                if (ave == 'djf'):
+                if ('djf' in ave):
                     if (mon == 'jan' or mon == 'feb'): 
-                        glob_string = directory + "/" + prefix + '*next_' + ave_t.average_types[mon]['fn']
+                        glob_string = directory + "/" + prefix + '*next' + ave_t.average_types[mon]['fn']
                     else:
-                        glob_string = directory + "/" + prefix + '*prev_' + ave_t.average_types[mon]['fn']
+                        glob_string = directory + "/" + prefix + '*prev' + ave_t.average_types[mon]['fn']
                 else:
-                    glob_string = directory + "/" + prefix + '*' + ave_t.average_types[mon]['fn']
+                    glob_string = directory + "/" + prefix + '*.' + ave_t.average_types[mon]['fn']
                 file_list = glob.glob(glob_string)
                 year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':mon, 'pattern':None, 'suffix':'.nc'}
             else:
@@ -466,11 +470,19 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
             if (ave == 'hor.meanConcat'):
                 glob_string = directory + "/" + region + '_hor.meanyr.' +  yr_fmt + ".*"
             else:
-                glob_string = directory + "/" + prefix + "." + yr_fmt + ".*"
+                if '_sig' in ave or '_mean' in ave:
+                    ave_split = ave.split('_')
+                    seas = ave_split[0].upper()
+                    glob_string = directory + "/" + prefix + "." + yr_fmt + "._" + seas + "*"
+                else:
+                    glob_string = directory + "/" + prefix + "." + yr_fmt + ".nc"
             file_list = glob.glob(glob_string)
-            for m in range(0,12):
-                year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':yr_fmt, 'pattern':None, 'suffix':'.nc'}
-            hist_dict[yr] = year_dict
+            if len(file_list) > 0:
+                for m in range(0,12):
+                    year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':yr_fmt, 'pattern':None, 'suffix':'.nc'}
+                hist_dict[yr] = year_dict
+            else:
+                print('NO DICTIONARY ENTRY FOR YR ',yr)
     return hist_dict
 
  
@@ -497,7 +509,7 @@ def check_if_series_var(f, vn, unlimited):
     var = f.variables[vn]
 
     if (vn == unlimited):
-        if_series = False
+        if_series = True
     # if number of dims is less than or equal to one, not a series var
     elif (var.rank<2):
         if_series = False
@@ -512,6 +524,11 @@ def check_if_series_var(f, vn, unlimited):
         if_variant = True
     else:
         if_variant = False
+
+    if (vn == 'landmask' or vn == 'pftmask'):
+        if_series = False
+        if_variant = False
+        if_char    = False
 
     return if_series,if_variant,if_char 
 
