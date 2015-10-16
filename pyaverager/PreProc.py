@@ -117,7 +117,7 @@ class PreProc(object):
 
         AVE_TAG = 40
 
-        years = list(range(spec.year0,spec.year1+1))
+        years = list(range(int(spec.year0),int(spec.year1)+1))
         months = ave_t.average_types[ave_descr[0]]['months_to_average']
 
 	# Initialize simplecomm (MPI wrappers) 
@@ -136,9 +136,9 @@ class PreProc(object):
 	# Get the history dictionary that lists were files are located for each time slice, a variable list, meta list, and a key lookup variable
 	if (spec.hist_type == 'series'):
 	    hist_dict,file_var_list,meta_list,key = rover.set_slices_and_vars_time_series(spec.in_directory, spec.file_pattern, spec.date_pattern, 
-							spec.prefix, spec.suffix, spec.year0, spec.year1, spec.split, spec.split_files)
+							spec.prefix, spec.suffix, int(spec.year0), int(spec.year1), spec.split, spec.split_files)
 	else:
-	    hist_dict,file_var_list,meta_list,key = rover.set_slices_and_vars_time_slice(spec.in_directory, spec.file_pattern, spec.prefix, spec.suffix, spec.year0, spec.year1)
+	    hist_dict,file_var_list,meta_list,key = rover.set_slices_and_vars_time_slice(spec.in_directory, spec.file_pattern, spec.prefix, spec.suffix, int(spec.year0), int(spec.year1))
 
 	# Loop over the regions and variable names to get full list of variables
 	global_var_list = []
@@ -155,19 +155,19 @@ class PreProc(object):
 	if main_comm.is_manager() or spec.serial:
 	    local_var_list = global_var_list
 
-        meta_list = []
+        meta_list = ['time']
 
 	# Define the netcdf file
         outfile = 'ice_vol_'+spec.prefix[:-7]+'_'+str(spec.year0)+'-'+str(spec.year1)+'.nc'
 	all_files_vars,new_file = climFileIO.define_ave_file(main_comm.is_manager(),spec.serial,global_var_list,local_var_list,meta_list,hist_dict,spec.hist_type,
 	    ave_descr,spec.prefix,outfile,spec.split,split_hem[regions['GIN']],spec.out_directory,main_comm,spec.ncformat,
-	    ave_t.average_types[ave_descr[0]]['months_to_average'][0],key,spec.clobber,spec.year0,attributes,variables)
+	    ave_t.average_types[ave_descr[0]]['months_to_average'][0],key,spec.clobber,int(spec.year0),int(spec.year1),attributes,variables)
 
 	# If using time slice files, open all files now
         if (len(local_var_list) > 0):
 	    if (spec.hist_type == 'slice' and (spec.serial or not main_comm.is_manager())):
 	        file_dict,open_list = climFileIO.open_all_files(hist_dict,ave_t.average_types[ave_descr[0]]['months_to_average'],
-		    		        years,local_var_list[0],'null',ave_descr[0],False)
+		    		        years,local_var_list[0],'null',ave_descr[0],False,int(spec.year0))
 
 	# Loop over each variable in the local list and read/operate on/write
 	for nc_var in local_var_list:
@@ -194,8 +194,10 @@ class PreProc(object):
 		if (spec.hist_type == 'series'):
                     if spec.split:
                         split_name = split_hem[regions[reg]]
+                    else:
+                        split_name = ''
 		    file_dict,open_list = climFileIO.open_all_files(hist_dict,ave_t.average_types[ave_descr[0]]['months_to_average'],
-					    years,get_var_name,split_name,ave_descr[0],False) 
+					    years,get_var_name,split_name,ave_descr[0],False,int(spec.year0)) 
 
 	    time_slice = 0
 	    for year in years:

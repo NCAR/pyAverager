@@ -61,7 +61,7 @@ def open_file(var, month_dict, split, mess='None'):
     return my_file
 
 
-def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend):
+def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,fyr):
 
     '''
     Opens all of the nc files that are needed to compute this portion of the averaging
@@ -94,17 +94,19 @@ def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend):
     years_to_open = list(years)
     # check to see if we need to open an extra year
     if(ave_type == 'djf'):
-        if (len(hist_dict[years[0]-1])<1):
-            last_index = len(years)-1
-            if (len(hist_dict[years[last_index]+1])<2):
-                print 'ERROR: In order to calculate DJF, you must have either December',str(years[0]-1),'or January and February',str(years[last_index]+1),'.  Exiting'
-                sys.exit(21)
+        prev_year = int(years[0])-1
+        if (prev_year in hist_dict.keys()):
+            if (len(hist_dict[years[0]-1])<1):
+                last_index = len(years)-1
+                if (len(hist_dict[years[last_index]+1])<2):
+                    print 'ERROR: In order to calculate DJF, you must have either December',str(years[0]-1),'or January and February',str(years[last_index]+1),'.  Exiting'
+                    sys.exit(21)
     if((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
-        pull_year = which_winter_year(hist_dict, 11,years[0],years[0])
+        pull_year = which_winter_year(hist_dict, 11,years[0],fyr)
         if(pull_year not in years):
             years_to_open.append(pull_year)
-        pull_year = which_winter_year(hist_dict, 0,years[-1],years[0])
+        pull_year = which_winter_year(hist_dict, 0,years[-1],fyr)
         if(pull_year not in years):
             years_to_open.append(pull_year)
     for yr in years_to_open:
@@ -188,11 +190,11 @@ def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
     elif(ave_type == 'hor.meanConcat'):
         outfile_name = reg+'_hor_mean_'+ave_type+"."+prefix+"_"+date+"."+suffix
     else:
-        outfile_name = prefix+"_"+suffix
+        outfile_name = prefix+"."+date+"."+suffix
 
     return outfile_name
 
-def create_ave_file(my_file,outfile,hist_string,ncformat):
+def create_ave_file(my_file,outfile,hist_string,ncformat,years):
  
     '''
     Opens up/Creates a new file to put the computed averages into.
@@ -222,12 +224,15 @@ def create_ave_file(my_file,outfile,hist_string,ncformat):
         opt.Format = 'NetCDF4Classic'
     elif (ncformat == 'netcdf'):
         opt.Format  = 'Classic'
+    elif (ncformat == 'netcdfLarge'):
+        opt.Format = '64BitOffset'
     else:
         print "WARNING: Seltected netcdf file format (",ncformat,") is not recongnized."
         print "Defaulting to netcdf3Classic format."
         opt.Format  = 'Classic'
     opt.PreFill = False
     new_file = Nio.open_file(new_file_name, "w", options=opt, history=hist_string)
+    setattr(new_file,'yrs_averaged',years)
  
     # Create attributes, dimensions, and variables
     for n,v in attr.items():
@@ -325,7 +330,7 @@ def get_var_info(my_file, var_name, ave_descr):
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
                         outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
-			pre_proc_attr=None, pre_proc_variables=None):
+			endYr,pre_proc_attr=None, pre_proc_variables=None):
 
     '''
     The function controls the defining of a new NetCDF file.
@@ -368,6 +373,8 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
     @param clobber       Boolean to remove an already existing average file.
 
     @param firstYr       The first year in the average range.
+
+    @param endYr         The last year in the average range.
 
     @param pre_proc_attr  Optional: used in the pre_proc calculations to specify specific attributes to use.
 
@@ -414,8 +421,9 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
                 os.remove(new_file_name)
             else:
                 print 'ERROR: ',new_file_name,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
-                sys.exit(40) 
-        new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt)
+                sys.exit(40)
+        years = str(firstYr)+'-'+str(endYr) 
+        new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt,years)
         # Add meta variables
         temp = {}
         for mv in meta_list:
@@ -462,7 +470,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
             if (pre_proc_attr is not None):
                 pre_proc_attr['units'] = pre_proc_variables[unit_var]['units']
                 attr = pre_proc_attr
-            var_info = {'varname':write_var, 'type_code':type_code, 'dim_names':dimnames, 'attr':attr}
+            var_info = {'varname':write_var, 'origname':orig_var_name, 'type_code':type_code, 'dim_names':dimnames, 'attr':attr}
             if (not serial):
                 simplecomm.collect(data=var_info,tag=VAR_INFO_TAG)
         if (serial or l_master):
@@ -470,8 +478,9 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
                 r_rank,var_info = simplecomm.collect(tag=VAR_INFO_TAG)
             temp = {}
             vn = var_info['varname']
+            orig = var_info['origname']
             #  Add variable to file.  If vn is 'hor.meanyr', we need to add a _DIFF and _RMS variable per variable in loop.
-            if ('hor.meanyr' in ave_descr):
+            if ('hor.meanyr' in ave_descr and '__meta' not in orig):
                 for var in (vn,vn+'_DIFF',vn+'_RMS'):
                     temp[var] = create_var(var, var_info['type_code'], ['time','z_t'], var_info['attr'],new_file)
             else:
