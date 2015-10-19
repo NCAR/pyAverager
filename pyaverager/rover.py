@@ -201,9 +201,9 @@ def set_slices_and_vars_time_series(directory, file_pattern, date_pattern, prefi
                     if (yr == date["year1"]):
                         if (previousMonth == (date["month1"]-1)):
                             year_list[yr].append(stamp)
-                        else:
-                            print("ERROR: Split year -- doesn't look contiguous. Exiting.") 
-                            sys.exit(22)
+                        #else:
+                        #    print("ERROR: Split year -- doesn't look contiguous. Exiting.") 
+                        #    sys.exit(22)
                     else:
                         print("ERROR: Found more than 1 file that contains year ", yr, ".  Exiting.")
                         sys.exit(23)
@@ -224,9 +224,9 @@ def set_slices_and_vars_time_series(directory, file_pattern, date_pattern, prefi
 		((previous_year == date["year1"]) and (previous_month == (date["month1"] - 1)))):
                 previous_year = date["year2"]
                 previous_month = date["month2"]
-            else:
-                print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
-                sys.exit(22)
+            #else:
+            #    print("ERROR: There's a break in the sequence -- date stamps do not appear contiguous. Exiting.")
+            #    sys.exit(22)
     # Create date/slice lookup table
     hist_dict = {}
     for yr in years:
