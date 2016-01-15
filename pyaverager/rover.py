@@ -1,6 +1,7 @@
 import glob,sys,os
 import Nio
 import time
+import numpy.ma as ma
 
 def fn_split(name_fp, prefix, suffix, split_fn, date_pattern, file_pattern):
 
@@ -558,5 +559,11 @@ def fetch_slice(hist_dict, yr, month, var, file_dict, time=True):
         var_val = var_hndl[hist_dict[yr][month]['index']]
     else:
         var_val = var_hndl[:]
+
+    # Check to see if scale_factor exists.  If it does, apply the scale factor.
+    if hasattr(var_hndl,'scale_factor'):
+        scale_factor = getattr(var_hndl,'scale_factor')
+        var_val = scale_factor * var_val
+    
     return var_val
 
