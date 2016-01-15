@@ -294,7 +294,8 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
 
     temp = new_file.create_variable(var_name,typeCode,tuple(dimnames))
     for ka,va in attr.items():
-      setattr(temp,ka,va)
+      if ka != 'scale_factor':
+          setattr(temp,ka,va)
 
     return temp
 
