@@ -348,23 +348,20 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
 
     # Get correct data slice from the yearly average file
     var_val = rover.fetch_slice(hist_dict,year,0,var,file_dict)
+
     # Get the weighted values from the yearly average file
-    lev_weights = rover.fetch_slice(hist_dict,year,0,wgt_var,file_dict,time=False).astype(np.float32)
+    slev_weights = rover.fetch_slice(hist_dict,year,0,wgt_var,file_dict,time=False)
     # Get the region mask
-    if (reg_name == 'Glo'):
-        temp = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
-        lev_region_mask = MA.masked_where(int(reg_num)==temp,temp)
-    else:
-        temp = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
-        lev_region_mask = MA.masked_where(int(reg_num)!=temp,temp)
+    slev_mask = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
+
     # Since weights and region mask are only one level, we need to expand them to all levels
-    region_mask = MA.expand_dims(temp, axis=0)
-    weights = MA.expand_dims(lev_weights, axis=0)
+    region_mask = MA.expand_dims(slev_mask, axis=0)
+    weights = MA.expand_dims(slev_weights, axis=0)
     if var_val.ndim > 2:
         for lev in range(1,60):
-            new_region_mask = MA.expand_dims(temp, axis=0)
+            new_region_mask = MA.expand_dims(slev_mask, axis=0)
             region_mask = np.vstack((region_mask,new_region_mask))
-            new_weights = MA.expand_dims(lev_weights, axis=0)
+            new_weights = MA.expand_dims(slev_weights, axis=0)
             weights = np.vstack((weights,new_weights))
     else:
         region_mask = np.squeeze(region_mask,axis=0)
@@ -375,9 +372,12 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
         temp_mask = MA.masked_where(region_mask==int(reg_num),var_val)
     else:
         temp_mask = MA.masked_where(region_mask!=int(reg_num),var_val)
-    ma_to_average = temp_mask.reshape(temp_mask.shape[0], -1)
+
+    weights = MA.masked_where(temp_mask,weights)
+    ma_to_average = temp_mask.reshape(temp_mask.shape[0], -2)
+
     if var_val.ndim > 2:
-        weights_flattened = weights.reshape(weights.shape[0],-1)
+        weights_flattened = weights.reshape(weights.shape[0],-2)
     else:
         weights_flattened = np.squeeze(weights,axis=0)
     var_Ave = MA.average(ma_to_average,axis=1, weights=weights_flattened)
@@ -446,12 +446,8 @@ def weighted_rms_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dic
     # Get the weighted values from the yearly average file
     lev_weights = rover.fetch_slice(hist_dict,year,0,wgt_var,file_dict,time=False).astype(np.float32)
     # Get the region mask
-    if (reg_name == 'Glo'):
-        temp = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
-        lev_region_mask = MA.masked_where(int(reg_num)==temp,temp)
-    else:
-        temp = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
-        lev_region_mask = MA.masked_where(int(reg_num)!=temp,temp)
+    temp = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
+
     # Since region mask is only one level, we need to expand it to all levels
     region_mask = MA.expand_dims(temp, axis=0)
     weights = MA.expand_dims(lev_weights, axis=0)
@@ -468,10 +464,11 @@ def weighted_rms_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dic
     else:
         temp_mask = MA.masked_where(region_mask!=int(reg_num),avg_test_slice)
 
+    weights = MA.masked_where(temp_mask,weights)
+
     warnings.filterwarnings("ignore")
-    #ma_to_average = MA.array(avg_test_slice, mask=region_mask).reshape(avg_test_slice.shape[0], -1)
-    ma_to_average = temp_mask.reshape(temp_mask.shape[0], -1)
-    weights_flattened = weights.reshape(weights.shape[0],-1)
+    ma_to_average = temp_mask.reshape(temp_mask.shape[0], -2)
+    weights_flattened = weights.reshape(weights.shape[0],-2)
     rms_Ave = MA.sqrt(MA.average((ma_to_average*ma_to_average), axis=1, weights=weights_flattened))    
     warnings.filterwarnings("default")
 
