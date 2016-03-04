@@ -105,7 +105,8 @@ class PyAverager(object):
 
 	    # Initialize the tag for the average send/recv
 	    AVE_TAG = 40
-	    
+            VNAME_TAG = 41	   
+ 
 	    #start_level = 0
             start_level = min(avg_dict.keys())
 	    found_level = False
@@ -381,7 +382,7 @@ class PyAverager(object):
 					# The mean diff rsm function will send the variables once they are created 
 					var_avg_results,var_DIFF_results,var_RMS_results = climAverager.mean_diff_rms(var,region_name,region_num,spec.region_nc_var,
 					    spec.region_wgt_var,years,hist_dict,ave_t.average_types[ave_descr[0]],file_dict,obs_file,
-					    reg_obs_file,inter_comm,spec.serial,AVE_TAG)
+					    reg_obs_file,inter_comm,spec.serial,VNAME_TAG,AVE_TAG)
 				    else:
 					if ('__metaChar' in orig_var):
 					    # Handle special meta
@@ -403,10 +404,13 @@ class PyAverager(object):
 					# Pass the average results to master rank for writing
 					var_shape = var_avg_results.shape
 					var_dtype = var_avg_results.dtype
-					md_message = {'name':var,'shape':var_shape,'dtype':var_dtype,'average':var_avg_results}
+                                        var_type = type(var_avg_results)
+					md_message = {'name':var,'shape':var_shape,'dtype':var_dtype,'average':var_avg_results,'type':var_type}
 					if not spec.serial:
 					    timer.start("Send Average Time")
-					    inter_comm.collect(data=md_message, tag=AVE_TAG)
+					    #inter_comm.collect(data=md_message, tag=AVE_TAG)
+                                            inter_comm.collect(data=var, tag=VNAME_TAG)
+                                            inter_comm.collect(data=var_avg_results, tag=AVE_TAG)
 					    timer.stop("Send Average Time")
 	
 				if spec.serial or l_master:
@@ -419,9 +423,11 @@ class PyAverager(object):
 				    for r in range(0,var_cnt):
 					if not spec.serial:
 					    timer.start("Recv Average Time")
-					    r_rank,results = inter_comm.collect(tag=AVE_TAG)
-					    r_var_avg_results = results['average']
-					    var_name = results['name']
+					    #r_rank,results = inter_comm.collect(tag=AVE_TAG)
+					    #r_var_avg_results = results['average']
+                                            r_rank,var_name = inter_comm.collect(tag=VNAME_TAG)
+                                            r_rank,r_var_avg_results = inter_comm.collect(tag=AVE_TAG)
+					    #var_name = results['name']
 					    timer.start("Recv Average Time") 
 					else:
 					    var_name = var
