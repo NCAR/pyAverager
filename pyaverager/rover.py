@@ -436,6 +436,9 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
 
     import average_types as ave_t
     import string
+   
+    yr1_str = string.zfill(start_yr,4)
+    yr2_str = string.zfill(end_yr,4)
 
     hist_dict = {}
     if (ave_type['depend_type'] == 'month'):
@@ -449,11 +452,11 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
             if (mon in ave_type['depend']):
                 if ('djf' in ave):
                     if (mon == 'jan' or mon == 'feb'): 
-                        glob_string = directory + "/" + prefix + '*next' + ave_t.average_types[mon]['fn']
+                        glob_string = directory + "/" + prefix + '*' + yr1_str + '-' + yr2_str + '*next' + ave_t.average_types[mon]['fn']
                     else:
-                        glob_string = directory + "/" + prefix + '*prev' + ave_t.average_types[mon]['fn']
+                        glob_string = directory + "/" + prefix + '*' + yr1_str + '-' + yr2_str + '*prev' + ave_t.average_types[mon]['fn']
                 else:
-                    glob_string = directory + "/" + prefix + '*.' + ave_t.average_types[mon]['fn']
+                    glob_string = directory + "/" + prefix + '*' + yr1_str + '-' + yr2_str + '*.' + ave_t.average_types[mon]['fn']
                 file_list = glob.glob(glob_string)
                 year_dict[m] = {'directory':directory, 'fn': file_list[0], 'index':0, 'date_stamp':mon, 'pattern':None, 'suffix':'.nc'}
             else:

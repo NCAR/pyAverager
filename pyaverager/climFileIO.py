@@ -51,6 +51,7 @@ def open_file(var, month_dict, split, mess='None'):
                     i_fn = i_fn + month_dict['suffix']
                 else:
                     i_fn = i_fn + p
+            #print 'Opening: ',i_fn 
             if not (os.path.isfile(i_fn)):
                 print("ERROR: Cannot find ",i_fn,".  Exiting.") 
                 sys.exit(20) 
@@ -442,14 +443,20 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         if ('hor.meanConcat' in ave_descr or 'preproc' in ave_descr):
             vn_split = var_fn.split('_')
             if ('preproc' in ave_descr):
-                if ('ext' in vn_split[0]):
-                    lookup_vn = vn_split[0]
-                    unit_var = vn_split[0]
+                if ('time' in var_fn):
+                    var_fn = 'aice'
+                    lookup_vn = orig_var_name
+                    unit_var = orig_var_name
+                    write_var = orig_var_name
                 else:
-                    lookup_vn = vn_split[0][1:]
-                    unit_var = vn_split[0][1:]
-                write_var = orig_var_name
-                var_fn = vn_split[0][1:]
+                    if ('ext' in vn_split[0]):
+                        lookup_vn = vn_split[0]
+                        unit_var = vn_split[0]
+                    else:
+                        lookup_vn = vn_split[0][1:]
+                        unit_var = vn_split[0][1:]
+                    write_var = orig_var_name
+                    var_fn = vn_split[0][1:]
             else:
                 lookup_vn = vn_split[0]
                 write_var = orig_var_name
@@ -468,7 +475,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
  
         if(serial or not l_master):
             type_code,dimnames,attr = get_var_info(f,lookup_vn,ave_descr)
-            if (pre_proc_attr is not None):
+            if (pre_proc_attr is not None and 'time' not in unit_var):
                 pre_proc_attr['units'] = pre_proc_variables[unit_var]['units']
                 attr = pre_proc_attr
             var_info = {'varname':write_var, 'origname':orig_var_name, 'type_code':type_code, 'dim_names':dimnames, 'attr':attr}
