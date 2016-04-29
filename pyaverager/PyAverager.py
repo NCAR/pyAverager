@@ -272,7 +272,7 @@ class PyAverager(object):
 										ave_t.average_types[ave_descr[0]],ave_descr[0],region_name)
 			else:
 			    hist_dict = dict(full_hist_dict)   
-		       
+
 			# If concat' mean_diff_rms files, for each var, also add the _DIFF and _RMS variables.
 			if ('hor.meanConcat' in ave_descr and added_extra_vars==False):
 			    new_vars = []

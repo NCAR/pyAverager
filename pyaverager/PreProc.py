@@ -116,7 +116,9 @@ class PreProc(object):
         ave_descr = ['preproc',str(spec.year0),str(spec.year1)]
 
         AVE_TAG = 40
-
+ 
+        time_dim = 'time'
+ 
         years = list(range(int(spec.year0),int(spec.year1)+1))
         months = ave_t.average_types[ave_descr[0]]['months_to_average']
 
@@ -141,27 +143,29 @@ class PreProc(object):
 	    hist_dict,file_var_list,meta_list,key = rover.set_slices_and_vars_time_slice(spec.in_directory, spec.file_pattern, spec.prefix, spec.suffix, int(spec.year0), int(spec.year1))
 
 	# Loop over the regions and variable names to get full list of variables
-	global_var_list = []
+        global_var_list = []
 	for reg in regions:
             for var in variables:
                 if ('ext' in var):
                     global_var_list.append(var+'_mo_'+reg) 
                 else:
-	            global_var_list.append('v'+var+'_mo_'+reg) 
-        
+	            global_var_list.append('v'+var+'_mo_'+reg)
+        global_var_list.append('time') 
+
 	# Partition the global variable list between the MPI ranks
 	local_var_list = main_comm.partition(global_var_list,func=partition.EqualLength(),involved=False)
 	# If master/root, give it the full variable list
 	if main_comm.is_manager() or spec.serial:
 	    local_var_list = global_var_list
 
-        meta_list = ['time']
+        meta_list = []
 
 	# Define the netcdf file
         outfile = 'ice_vol_'+spec.prefix[:-7]+'_'+str(spec.year0)+'-'+str(spec.year1)+'.nc'
 	all_files_vars,new_file = climFileIO.define_ave_file(main_comm.is_manager(),spec.serial,global_var_list,local_var_list,meta_list,hist_dict,spec.hist_type,
 	    ave_descr,spec.prefix,outfile,spec.split,split_hem[regions['GIN']],spec.out_directory,main_comm,spec.ncformat,
 	    ave_t.average_types[ave_descr[0]]['months_to_average'][0],key,spec.clobber,int(spec.year0),int(spec.year1),attributes,variables)
+       
 
 	# If using time slice files, open all files now
         if (len(local_var_list) > 0):
@@ -174,15 +178,19 @@ class PreProc(object):
 	    if not main_comm.is_manager() or spec.serial: # Slave
                 print('Computing ice_pre_proc for', nc_var)
               # Get variable/region names
-                var_name,reg = nc_var.split('_mo_')
-                if ('ext' in var_name):
-                    var_name = var_name
-                else:
-                    var_name = var_name[1:]
-                if ('ext' in var_name or 'ai' in var_name):
+                if ('time' in nc_var):
                     get_var_name = 'aice'
+                    var_name = 'time'
                 else:
-                    get_var_name = var_name
+                    var_name,reg = nc_var.split('_mo_')
+                    if ('ext' in var_name):
+                        var_name = var_name
+                    else:
+                        var_name = var_name[1:]
+                    if ('ext' in var_name or 'ai' in var_name):
+                        get_var_name = 'aice'
+                    else:
+                        get_var_name = var_name
                 # Get observation lat,lon,area
                 obs_file = spec.ice_obs_file
                 tarea = 'TAREA'
@@ -203,44 +211,47 @@ class PreProc(object):
 	    for year in years:
               for m in months:
 		if not main_comm.is_manager() or spec.serial: # Slave
-		    # Get month slice
-		    var_slice = rover.fetch_slice(hist_dict, year, m, get_var_name, file_dict)
-                    lat,lon = var_slice.shape
-                    full_lat,full_lon = o_lat.shape
-                    if spec.split:
-                        fill = full_lat-lat
-                        missing_vals = np.zeros((fill,lon))
-                        var_slice = np.array(var_slice)
-                        var_slice[var_slice >= 1e+20] = 0 
-                        if regions[reg] == 1: 
-                            var_slice = np.concatenate((var_slice,missing_vals),axis=0)
-                        else:
-                            var_slice = np.concatenate((missing_vals,var_slice),axis=0)
+                    if ('time' in nc_var):
+                        var_sum = rover.fetch_slice(hist_dict, year, m, var_name, file_dict)
+                    else:
+		        # Get month slice
+		        var_slice = rover.fetch_slice(hist_dict, year, m, get_var_name, file_dict)
+                        lat,lon = var_slice.shape
+                        full_lat,full_lon = o_lat.shape
+                        if spec.split:
+                            fill = full_lat-lat
+                            missing_vals = np.zeros((fill,lon))
+                            var_slice = np.array(var_slice)
+                            var_slice[var_slice >= 1e+20] = 0 
+                            if regions[reg] == 1: 
+                                var_slice = np.concatenate((var_slice,missing_vals),axis=0)
+                            else:
+                                var_slice = np.concatenate((missing_vals,var_slice),axis=0)
 
-		    # Get ai factor
-		    if ('ext' in var_name or 'ai' in var_name):
-			aimax = np.amax(var_slice)
-			if (aimax < 2):
-			    aifac = 100
-			else:
-			    aifac = 1
-			var_slice = var_slice*aifac
-                   # The ext variable is true/false based on the ai variable.  Set accordingly 
-                    if ('ext' in var_name):
-                        var_slice = np.array(var_slice)
-                        var_slice[var_slice >= 1e+20] = 0
-                        var_slice[var_slice < 15] = 0
-                        var_slice[var_slice >= 15] = 1
+		        # Get ai factor
+		        if ('ext' in var_name or 'ai' in var_name):
+			    aimax = np.amax(var_slice)
+			    if (aimax < 2):
+			        aifac = 100
+			    else:
+			        aifac = 1
+			    var_slice = var_slice*aifac
+                       # The ext variable is true/false based on the ai variable.  Set accordingly 
+                        if ('ext' in var_name):
+                            var_slice = np.array(var_slice)
+                            var_slice[var_slice >= 1e+20] = 0
+                            var_slice[var_slice < 15] = 0
+                            var_slice[var_slice >= 15] = 1
 
-                    # Mult by weight
-                    var_slice = var_slice * o_area
+                        # Mult by weight
+                        var_slice = var_slice * o_area
 
-                    # Mask the variable to get just this region
-                    mask_to_apply = self.read_reg_mask(spec.reg_file,reg)
-                    masked_var = MA.masked_where(mask_to_apply==0,var_slice) 
+                        # Mask the variable to get just this region
+                        mask_to_apply = self.read_reg_mask(spec.reg_file,reg)
+                        masked_var = MA.masked_where(mask_to_apply==0,var_slice) 
 
-                    # Sum the variable 
-		    var_sum = self.get_sum(masked_var,variables[var_name],var_name)
+                        # Sum the variable 
+		        var_sum = self.get_sum(masked_var,variables[var_name],var_name)
 
 		    # Pass the average results to master rank for writing
 		    var_shape = var_sum.shape
