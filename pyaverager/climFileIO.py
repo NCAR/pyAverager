@@ -233,7 +233,7 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years):
         opt.Format  = 'Classic'
     opt.PreFill = False
     new_file = Nio.open_file(new_file_name, "w", options=opt, history=hist_string)
-    setattr(new_file,'yrs_averaged',years)
+    #setattr(new_file,'yrs_averaged',years)
  
     # Create attributes, dimensions, and variables
     for n,v in attr.items():
@@ -245,6 +245,7 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years):
             new_file.create_dimension(var_d, None)
         else:
             new_file.create_dimension(var_d,l)
+    setattr(new_file,'yrs_averaged',years)
     return new_file
 
 def create_meta_var(my_file, var_name, new_file):
@@ -332,7 +333,7 @@ def get_var_info(my_file, var_name, ave_descr):
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
                         outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
-			endYr,pre_proc_attr=None, pre_proc_variables=None):
+			endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None):
 
     '''
     The function controls the defining of a new NetCDF file.
@@ -424,7 +425,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
             else:
                 print 'ERROR: ',new_file_name,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
                 sys.exit(40)
-        years = str(firstYr)+'-'+str(endYr) 
+        years = ave_date 
         new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt,years)
         # Add meta variables
         temp = {}
