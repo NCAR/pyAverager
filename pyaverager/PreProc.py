@@ -162,9 +162,10 @@ class PreProc(object):
 
 	# Define the netcdf file
         outfile = 'ice_vol_'+spec.prefix[:-7]+'_'+str(spec.year0)+'-'+str(spec.year1)+'.nc'
+        ave_date = str(spec.year0)+'-'+str(spec.year1)
 	all_files_vars,new_file = climFileIO.define_ave_file(main_comm.is_manager(),spec.serial,global_var_list,local_var_list,meta_list,hist_dict,spec.hist_type,
 	    ave_descr,spec.prefix,outfile,spec.split,split_hem[regions['GIN']],spec.out_directory,main_comm,spec.ncformat,
-	    ave_t.average_types[ave_descr[0]]['months_to_average'][0],key,spec.clobber,int(spec.year0),int(spec.year1),attributes,variables)
+	    ave_t.average_types[ave_descr[0]]['months_to_average'][0],key,spec.clobber,int(spec.year0),int(spec.year1),ave_date,attributes,variables)
        
 
 	# If using time slice files, open all files now
