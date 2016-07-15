@@ -287,22 +287,18 @@ class PyAverager(object):
 			timer.start("Create/Define Netcdf File")
                         if (len(ave_descr)<3 or 'hor.meanyr' in ave_descr):
                             ave_date = string.zfill(ave_descr[1],4)
+                            ave_date2 = str(ave_descr[1])
                         else:
                             date1 = string.zfill(ave_descr[1],4)
                             date2 = string.zfill(ave_descr[2],4)
                             ave_date = date1+'-'+date2
-			#if ('mavg' in ave_descr or 'tavg' in ave_descr or 'hor.meanConcat' in ave_descr or 'annall' in ave_descr):
-			#    date1 = string.zfill(ave_descr[1],4)
-			#    date2 = string.zfill(ave_descr[2],4)
-			#    ave_date = date1+'-'+date2
-			#else:
-			#    ave_date = string.zfill(ave_descr[1],4)
+                            ave_date2 = str(ave_descr[1])+'-'+str(ave_descr[2])
 			outfile_name = climFileIO.get_out_fn(ave_descr[0],prefix,ave_date,ave_t.average_types[ave_descr[0]]['fn'],region_name)
 			all_files_vars,new_file = climFileIO.define_ave_file(l_master,spec.serial,var_list,lvar_list,meta_list,hist_dict,
 									     spec.hist_type,ave_descr,prefix,outfile_name,
 									     spec.split,split_name,spec.out_directory,inter_comm,
 									     spec.ncformat,ave_t.average_types[ave_descr[0]]['months_to_average'][0],
-                                                                             key,spec.clobber,spec.year0,spec.year1) 
+                                                                             key,spec.clobber,spec.year0,spec.year1,ave_date2) 
 			timer.stop("Create/Define Netcdf File")
 		       
 			# Start loops to compute averages
