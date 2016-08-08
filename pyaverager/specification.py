@@ -82,7 +82,8 @@ class pyAveragerSpecifier(Specifier):
                reg_file = 'null',
                ncl_location='null',
                year0=-99,
-               year1=-99):
+               year1=-99,
+               collapse_dim=''):
     '''
     Initializes the internal data with optional arguments
 
@@ -151,6 +152,7 @@ class pyAveragerSpecifier(Specifier):
 
     @param year1            The last year - only used to create the cice pre_proc file. 
 
+    @param collapse_dims    Used to collapse/average over one dim.
     '''
 
     # Where the input is located
@@ -261,3 +263,6 @@ class pyAveragerSpecifier(Specifier):
 
     # Location of the ncl script that will be used to create reg_file if it doesn't exist
     self.ncl_location = ncl_location
+
+    # Used to collapse/average over one dim.
+    self.collapse_dim = collapse_dim

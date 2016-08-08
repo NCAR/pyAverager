@@ -5,7 +5,7 @@ import PreProc
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ice/mon/tseries/'
+in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ice/mon/tseries/'
 out_dir= '/glade/scratch/mickelso/averager_sandbox/results/ice/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cice.h'
 htype= 'series'

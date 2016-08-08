@@ -298,7 +298,7 @@ class PyAverager(object):
 									     spec.hist_type,ave_descr,prefix,outfile_name,
 									     spec.split,split_name,spec.out_directory,inter_comm,
 									     spec.ncformat,ave_t.average_types[ave_descr[0]]['months_to_average'][0],
-                                                                             key,spec.clobber,spec.year0,spec.year1,ave_date2) 
+                                                                             key,spec.clobber,spec.year0,spec.year1,ave_date2,collapse_dim=spec.collapse_dim) 
 			timer.stop("Create/Define Netcdf File")
 		       
 			# Start loops to compute averages
@@ -364,10 +364,10 @@ class PyAverager(object):
 				var = parts[0]
 			    # If concat, all of the procs will participate in this call
 			    if ('mavg' in ave_descr or 'moc' in ave_descr or 'mocm' in ave_descr or 'hor.meanConcat' in ave_descr 
-                                or 'annall' in ave_descr or 'mons' in ave_descr or '_mean' in ave_descr[0]):
+                                or 'annall' in ave_descr or 'mons' in ave_descr or '_mean' in ave_descr[0] or 'zonalavg' in ave_descr):
 					# Concat
 					var_avg_results =  climAverager.time_concat(var,years,hist_dict,ave_t.average_types[ave_descr[0]],
-								    file_dict,ave_descr[0],inter_comm,all_files_vars,spec.serial)
+								    file_dict,ave_descr[0],inter_comm,all_files_vars,spec.serial,collapse_dim=spec.collapse_dim)
 			    # Else (not concat), each slave will compute averages and each master will collect and write
 			    else:
 				if spec.serial or not l_master:

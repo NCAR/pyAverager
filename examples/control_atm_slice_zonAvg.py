@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
 from pyaverager import PyAverager, specification
-import os
 
 #### User modify ####
 
-in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/atm/hist/'
-out_dir= os.environ.get('RESULTS_DIR')+'/atm_se/slice/'
-pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cam.h0'
+in_dir='/glade/p/work/mickelso/pyAverager/data/orig/'
+out_dir= '/glade/p/work/mickelso/pyAverager/data/new/'
+pref= 'f.e15.FAMIPW6SC.f09_f09.misc_cam5_4_75.001.cam.h0'
 htype= 'slice'
-average= ['dep_mam:1:10','jan:1:10']
-wght= True
+average= ['zonalavg:2004:2005']
+collapse_dim = 'lon'
+wght= False
 ncfrmt = 'netcdf'
-serial=True
+serial=False
 suffix = 'nc'
 clobber = True
 date_pattern= 'yyyymm-yyyymm'
@@ -26,6 +26,7 @@ pyAveSpecifier = specification.create_specifier(in_directory=in_dir,
                                   date_pattern=date_pattern,
 				  hist_type=htype,
 				  avg_list=average,
+                                  collapse_dim=collapse_dim,
 				  weighted=wght,
 				  ncformat=ncfrmt,
 				  serial=serial,
