@@ -1,8 +1,8 @@
 #!/bin/csh
-#BSUB -n 160 
-#BSUB -q regular 
+#BSUB -n 32 
+#BSUB -q geyser
 #BSUB -N 
-#BSUB -W 6:00
+#BSUB -W 12:00
 #BSUB -R "span[ptile=8]"
 #BSUB -P STDD0002 
 #BSUB -o pyAve.%J.out         # output file name in which %J is replaced by the job ID
@@ -10,9 +10,11 @@
 
 module load python 
 module load all-python-libs
+setenv PYTHONPATH /glade/p/work/mickelso/pyAverager/pyAverager/pyaverager/:$PYTHONPATH
+
 
 set testing_root = /glade/scratch/mickelso/averager_sandbox/
-set control_root = /glade/u/tdd/asap/pyAverager/testing_compare/ 
+set control_root = /glade/p/tdd/asap/pyAverager/testing_compare/ 
 
 # Control which test sets will get ran
 # 1 = on, 0 = off 

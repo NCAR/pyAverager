@@ -5,7 +5,7 @@ import PreProc
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ice/hist/'
+in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ice/hist/'
 out_dir= '/glade/scratch/mickelso/averager_sandbox/results/ice/slice/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cice.h'
 htype= 'slice'

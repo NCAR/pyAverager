@@ -4,7 +4,7 @@ from pyaverager import PyAverager, specification
 
 #### User modify ####
 
-in_dir='/glade/u/tdd/asap/data/b40.20th.track1.1deg.006/atm/mon/tseries/'
+in_dir='/glade/p/tdd/asap/data/b40.20th.track1.1deg.006/atm/mon/tseries/'
 out_dir= '/glade/scratch/mickelso/averager_sandbox/results/atm/series'
 pref= 'b40.20th.track1.1deg.006.cam2.h0'
 htype= 'series'
