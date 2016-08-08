@@ -536,7 +536,7 @@ def check_if_series_var(f, vn, unlimited):
 
     return if_series,if_variant,if_char 
 
-def fetch_slice(hist_dict, yr, month, var, file_dict, time=True):
+def fetch_slice(hist_dict, yr, month, var, file_dict, time=True, ext_select=None):
 
     '''
     Based on indexing found within the file_dictionary, return the correct data slice
@@ -553,6 +553,8 @@ def fetch_slice(hist_dict, yr, month, var, file_dict, time=True):
 
     @param time           A particular index to pull.   
 
+    @param ext_select     String of dimension info for PyNIO's extended subsection method 
+
     @return var_val       The time slice that was requested in numPy array format.
     '''
 
@@ -560,6 +562,8 @@ def fetch_slice(hist_dict, yr, month, var, file_dict, time=True):
 
     if (time):
         var_val = var_hndl[hist_dict[yr][month]['index']]
+    elif (ext_select != None):
+        var_val = var_hndl[ext_select]
     else:
         var_val = var_hndl[:]
 

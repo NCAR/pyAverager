@@ -2,7 +2,7 @@
 
 from pyaverager import PyAverager, specification
 
-in_dir = '/glade/u/tdd/asap/bakeoff/other_models/gfdl/'
+in_dir = '/glade/p/tdd/asap/bakeoff/other_models/gfdl/'
 out_dir= '/glade/scratch/mickelso/averager_sandbox/results/other/gfdl/'
 prefix= 'Amon_GFDL-FLORB01_FLORB01-P1-ECDA-v3.1-011980'
 m_id = ['r1i1p1','r2i1p1','r3i1p1','r4i1p1','r5i1p1','r6i1p1','r7i1p1','r8i1p1','r9i1p1','r10i1p1','r11i1p1','r12i1p1']
@@ -11,7 +11,7 @@ average=['ya:1980']
 suffix= 'nc'
 
 
-#in_dir = '/glade/u/tdd/asap/bakeoff/other_models/HadCM3/'
+#in_dir = '/glade/p/tdd/asap/bakeoff/other_models/HadCM3/'
 #out_dir= '/glade/scratch/mickelso/averager_sandbox/results/other/HadCM3/'
 #prefix= 'Amon_HadCM3_decadal1960_r4i3p1'
 #file_pattern= ['$var','_','$prefix','_','$date_pattern','.','$suffix']

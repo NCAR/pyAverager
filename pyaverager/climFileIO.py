@@ -195,7 +195,7 @@ def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
 
     return outfile_name
 
-def create_ave_file(my_file,outfile,hist_string,ncformat,years):
+def create_ave_file(my_file,outfile,hist_string,ncformat,years,collapse_dim=''):
  
     '''
     Opens up/Creates a new file to put the computed averages into.
@@ -207,6 +207,8 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years):
     @param hist_string   A string that contains the file history for the history attribute
 
     @param ncformat      Format to write the NetCDF file out as.
+
+    @param collapse_dim  Dimension to collapse across 
 
     @return new_file     Returns a file pointer to the newly opened file.
     '''
@@ -242,13 +244,15 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years):
         setattr(new_file,n,v)
     for var_d,l in dims.items():
         if var_d == "time":
-            new_file.create_dimension(var_d, None)
+            if "time" not in collapse_dim: 
+                new_file.create_dimension(var_d, None)
         else:
-            new_file.create_dimension(var_d,l)
+            if var_d not in collapse_dim:
+                new_file.create_dimension(var_d,l)
     setattr(new_file,'yrs_averaged',years)
     return new_file
 
-def create_meta_var(my_file, var_name, new_file):
+def create_meta_var(my_file, var_name, new_file,collapse_dim=''):
 
     '''
     Creeate a meta variable within the average file
@@ -268,7 +272,8 @@ def create_meta_var(my_file, var_name, new_file):
 
     dimnames = []
     for dimn in var_hndl.dimensions:
-        dimnames.append(dimn)
+        if dimn not in collapse_dim:
+            dimnames.append(dimn)
     temp = new_file.create_variable(var_name,typeCode,tuple(dimnames))
     for ka,va in var_hndl.attributes.items():
         setattr(temp,ka,va)
@@ -293,7 +298,6 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
 
     @return temp     A variable pointer.
     '''
-
     temp = new_file.create_variable(var_name,typeCode,tuple(dimnames))
     for ka,va in attr.items():
       if ka != 'scale_factor':
@@ -301,7 +305,7 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
 
     return temp
 
-def get_var_info(my_file, var_name, ave_descr):
+def get_var_info(my_file, var_name, ave_descr, collapse_dim=''):
 
     '''
     Gets the variable information that is needed for the rank to pass this
@@ -328,12 +332,13 @@ def get_var_info(my_file, var_name, ave_descr):
             if (my_file.unlimited(dimn)):
                 dimnames.append(dimn)
         else:
-            dimnames.append(dimn)
+            if dimn not in collapse_dim:
+                dimnames.append(dimn)
     return typeCode,dimnames,var_hndl.attributes
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
                         outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
-			endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None):
+			endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None,collapse_dim=''):
 
     '''
     The function controls the defining of a new NetCDF file.
@@ -383,6 +388,8 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
 
     @param pre_proc_variable Optional:  (used in the pre_proc calculations) variable names that need to be created.
 
+    @param collapse_dim Optional: dimension to collapse/average on 
+
     @return all_files_vars  All of the variable pointers.
 
     @return new_file        Pointer to the new output file.
@@ -426,11 +433,17 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
                 print 'ERROR: ',new_file_name,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
                 sys.exit(40)
         years = ave_date 
-        new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt,years)
+        new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt,years,collapse_dim)
+        # Remove extra dims from meta_list
+        if collapse_dim is not None:
+            dim_orig = my_file[first_fn].dimensions
+            for d in dim_orig:
+                if d in collapse_dim:
+                    meta_list.remove(d)
         # Add meta variables
         temp = {}
         for mv in meta_list:
-            temp[mv] = create_meta_var(my_file[first_fn],mv,new_file)
+            temp[mv] = create_meta_var(my_file[first_fn],mv,new_file,collapse_dim)
         all_files_vars = temp
 
     # Have each rank open it's own variable file(s), retreive variable info, and send to root to create variable 
@@ -475,7 +488,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
             write_var = parts[0]        
  
         if(serial or not l_master):
-            type_code,dimnames,attr = get_var_info(f,lookup_vn,ave_descr)
+            type_code,dimnames,attr = get_var_info(f,lookup_vn,ave_descr,collapse_dim)
             if (pre_proc_attr is not None and 'time' not in unit_var):
                 pre_proc_attr['units'] = pre_proc_variables[unit_var]['units']
                 attr = pre_proc_attr

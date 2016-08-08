@@ -21,6 +21,8 @@ average_types = {
         'weights':[0.08493150770664215, 0.07671232521533966, 0.08493150770664215, 0.08219178020954132,
                    0.08493150770664215, 0.08219178020954132, 0.08493150770664215, 0.08493150770664215,
                    0.08219178020954132, 0.08493150770664215, 0.08219178020954132, 0.08493150770664215]},
+    'zonalavg':{'months_to_average':[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        'type':'zonal average', 'fn':'zonal_avg.nc'},
     'tavg':{'months_to_average':[0], 'type':'yearly average:tavg', 'fn':'nc',
         'depend':['ya'], 'depend_type': 'year'},
     'annall':{'months_to_average':[0], 'type':'annual all','fn':'ANN_ALL.nc',

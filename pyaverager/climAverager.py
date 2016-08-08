@@ -353,7 +353,6 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
     slev_weights = rover.fetch_slice(hist_dict,year,0,wgt_var,file_dict,time=False)
     # Get the region mask
     slev_mask = rover.fetch_slice(hist_dict,year,0,mask_var,file_dict,time=False)
-
     # Since weights and region mask are only one level, we need to expand them to all levels
     region_mask = MA.expand_dims(slev_mask, axis=0)
     weights = MA.expand_dims(slev_weights, axis=0)
@@ -380,7 +379,6 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
     else:
         weights_flattened = np.squeeze(weights,axis=0)
     var_Ave = MA.average(ma_to_average,axis=1, weights=weights_flattened)
-
     return np.array(var_Ave)
 
 
@@ -549,10 +547,72 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
         #md_message = {'name':var_rms,'shape':var_RMS.shape,'dtype':var_RMS.dtype,'average':var_RMS}
         simplecomm.collect(data=var_rms,tag=MPI_TAG)
         simplecomm.collect(data=var_RMS,  tag=AVE_TAG)
-
     return var_Avg,var_DIFF,var_RMS 
 
-def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_files_vars,serial):
+def zonal_average(var,yr,month,hist_dict,file_dict,collapse_dim):
+
+    '''
+    Concats files together in the time dimension.
+
+    @param var             The name of the variable to concat.
+
+    @param yr              The year to average.
+
+    @param month           The month to average.
+
+    @param hist_dict       A dictionary that holds file references for all years/months.
+
+    @param file_dict       A dictionary which holds file pointers to the input files that
+                           are needed by this average calculation.
+
+    @param collapse_dim    Used to collapse/average over one dim. 
+
+    '''
+
+    # Get existing dimensions
+    orig_dims = file_dict[yr][month]['fp'].variables[var].dimensions 
+
+    # Creat a string to retreive the correct data slice
+    slice_string = ''
+    col_i = -999
+
+    if '<' not in collapse_dim:
+        for d in orig_dims:
+            if d != collapse_dim:        
+                if 'time' in d:
+                    i = hist_dict[yr][month]['index']
+                else:
+                    i = ':'
+                slice_string = slice_string+d+'|'+str(i)
+            else:
+                slice_string = slice_string+d+'|:'
+                col_i = orig_dims.index(d)-1
+            
+        # Get data slice
+        var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
+        if col_i != -999:
+            return np.mean(var_val, axis=col_i, dtype=np.float64)
+        else:
+            return var_val
+    else:
+        dims = collapse_dim.split(",")
+        spec_dims = {}
+        for d in dims:
+            bounds = d.split('<')
+            spec_dims[bounds[1]] = {'lower':bounds[0], 'upper':bounds[2]} 
+        for d in orig_dims:
+            if d != collapse_dim:    
+                if 'time' in d:
+                    i = str(hist_dict[yr][month]['index'])
+                elif d in spec_dims.keys():
+                    i = spec_dims[d]['lower']+':'+spec_dims[d]['upper']
+                else:
+                    i = ':'
+            slice_string = slice_string+d+' '+str(i)
+        var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
+        return np.mean(var_val, dtype=np.float64)
+
+def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_files_vars,serial,collapse_dim=''):
 
     '''
     Concats files together in the time dimension.
@@ -576,11 +636,14 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
 
     @param all_files_vars  All of the file's variables with ncids attached.
 
+    @param collapse_dim    Used to collapse/average over one dim.
+
     @serial                Boolean if running in serial mode.
 
     '''
     import asaptools
-    print('Concatenating ',ave_info['type'],' for ',var)
+    if (not simplecomm.is_manager() or serial):
+        print('Concatenating ',ave_info['type'],' for ',var)
     time_index = 0
     CONCAT_TAG = 60
     CONCAT_VAL_TAG = 67
@@ -593,7 +656,11 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
                 var = parts[0]
             # If slave, get slice and pass to master
             if (not simplecomm.is_manager() or serial):
-                var_val = rover.fetch_slice(hist_dict,yr,m,var,file_dict)
+                if 'zonalavg' in ave_type:
+                    if collapse_dim is not None:
+                        var_val = zonal_average(var,yr,m,hist_dict,file_dict,collapse_dim)
+                else:
+                    var_val = rover.fetch_slice(hist_dict,yr,m,var,file_dict)
                 #print var, asaptools.__version__,type(var_val),var_val.dtype
                 if not serial:
                     var_shape = var_val.shape
