@@ -559,7 +559,7 @@ def write_averages(temp, averages, var_name, index=-99):
 
     @param index      Optional: Insert at a certain time index.
     '''
- 
+
     if (temp[var_name].typecode() == 'i'):
         t = np.long
     else:

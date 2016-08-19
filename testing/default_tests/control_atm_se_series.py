@@ -9,7 +9,7 @@ in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/atm/mon/tser
 out_dir= os.environ.get('RESULTS_DIR')+'/atm_se/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.cam.h0'
 htype= 'series'
-average= ['dep_ann:1:10','dep_mam:1:10','dep_jja:1:10','dep_son:1:10',
+average= ['dep_ann:1:10','dep_mam:1:10','dep_jja:1:10','dep_son:1:10','zonalavg:1:10',
             'jan:1:10','feb:1:10','mar:1:10','apr:1:10','may:1:10','jun:1:10',
             'jul:1:10','aug:1:10','sep:1:10','oct:1:10','nov:1:10','dec:1:10']
 wght= True
