@@ -9,7 +9,7 @@ in_dir='/glade/p/tdd/asap/data/b40.20th.track1.1deg.006/atm/mon/tseries/'
 out_dir= os.environ.get('RESULTS_DIR')+'/atm/series/' 
 pref= 'b40.20th.track1.1deg.006.cam2.h0'
 htype= 'series'
-average= ['dep_ann:1850:1859','djf:1850:1858','dep_mam:1850:1859','dep_jja:1850:1859','dep_son:1850:1859',
+average= ['dep_ann:1850:1859','djf:1850:1858','dep_mam:1850:1859','dep_jja:1850:1859','dep_son:1850:1859','zonalavg:1850:1859',
             'jan:1850:1859','feb:1850:1859','mar:1850:1859','apr:1850:1859','may:1850:1859','jun:1850:1859',
             'jul:1850:1859','aug:1850:1859','sep:1850:1859','oct:1850:1859','nov:1850:1859','dec:1850:1859']
 wght= True
