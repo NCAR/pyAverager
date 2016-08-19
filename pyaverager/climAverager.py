@@ -549,7 +549,7 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
         simplecomm.collect(data=var_RMS,  tag=AVE_TAG)
     return var_Avg,var_DIFF,var_RMS 
 
-def zonal_average(var,yr,month,hist_dict,file_dict,collapse_dim):
+def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
 
     '''
     Concats files together in the time dimension.
@@ -589,7 +589,9 @@ def zonal_average(var,yr,month,hist_dict,file_dict,collapse_dim):
                 col_i = orig_dims.index(d)-1
             
         # Get data slice
+        timer.start("Variable fetch time")
         var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
+        timer.stop("Variable fetch time") 
         if col_i != -999:
             return np.mean(var_val, axis=col_i, dtype=np.float64)
         else:
@@ -609,10 +611,12 @@ def zonal_average(var,yr,month,hist_dict,file_dict,collapse_dim):
                 else:
                     i = ':'
             slice_string = slice_string+d+' '+str(i)
+        timer.start("Variable fetch time")
         var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
+        timer.stop("Variable fetch time") 
         return np.mean(var_val, dtype=np.float64)
 
-def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_files_vars,serial,collapse_dim=''):
+def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_files_vars,serial,timer,collapse_dim=''):
 
     '''
     Concats files together in the time dimension.
@@ -658,11 +662,19 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
             if (not simplecomm.is_manager() or serial):
                 if 'zonalavg' in ave_type:
                     if collapse_dim is not None:
-                        var_val = zonal_average(var,yr,m,hist_dict,file_dict,collapse_dim)
+                        timer.start("Time to compute Average")
+                        var_val = zonal_average(var,yr,m,hist_dict,file_dict,timer,collapse_dim)
+                        timer.stop("Time to compute Average")
                 else:
+                    timer.start("Time to compute Average")
+                    timer.start("Variable fetch time")
                     var_val = rover.fetch_slice(hist_dict,yr,m,var,file_dict)
+                    timer.stop("Time to compute Average")
+                    timer.stop("Variable fetch time")
                 #print var, asaptools.__version__,type(var_val),var_val.dtype
+                #--------------------
                 if not serial:
+                    timer.start("Send Average Time")
                     var_shape = var_val.shape
                     var_dtype = var_val.dtype
                     md_message = {'name':var,'shape':var_shape,'dtype':var_dtype,'index':time_index}
@@ -670,21 +682,26 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
                     #var_val = np.ma.filled(var_val)
                     #print type(var_val), md_message
                     simplecomm.collect(data=var_val,tag=CONCAT_VAL_TAG)
+                    timer.stop("Send Average Time")
             if (simplecomm.is_manager() or serial):
                 # If master, recv slice and write to file
                 if not serial:
+                    timer.start("Recv Average Time")
                     r_rank,results = simplecomm.collect(tag=CONCAT_TAG)
                     r_rank,var_val = simplecomm.collect(tag=CONCAT_VAL_TAG)
                     if results['dtype'] == 'S1':
                         var_val = var_val[0]
                     ti = results['index']
                     var_n = results['name']
+                    timer.stop("Recv Average Time")
                 else:
                     var_n = var
                     ti = time_index
                     if var_val.dtype == 'S1':
                         var_val = var_val[0]
+                timer.start("Write Netcdf Averages")
                 climFileIO.write_averages(all_files_vars, var_val, var_n, index=ti) 
+                timer.stop("Write Netcdf Averages")
             time_index = time_index + 1
 
 def get_metaCharValue(var,years,hist_dict,ave_info,file_dict,timer):
