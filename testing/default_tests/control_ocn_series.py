@@ -6,7 +6,8 @@ import os
 #### User modify ####
 
 in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/mon/tseries/'
-out_dir= os.environ.get('RESULTS_DIR')+'/ocn/series/'
+##out_dir= os.environ.get('RESULTS_DIR')+'/ocn/series/'
+out_dir= '/glade/scratch/aliceb/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.pop.h'
 htype= 'series'
 average = ['tavg:1:10','mavg:1:10','moc:1:10','mocm:1:10','hor.meanConcat:1:10']
@@ -22,6 +23,7 @@ region_wgt_var = 'TAREA'
 obs_dir = '/glade/p/work/mickelso/PyAvg-OMWG-obs/obs/'
 obs_file = 'obs.nc'
 reg_obs_file_suffix = '_hor_mean_obs.nc'
+vertical_levels = 60
 
 clobber = True
 suffix = 'nc'
@@ -47,6 +49,8 @@ pyAveSpecifier = specification.create_specifier(in_directory=in_dir,
                                   region_wgt_var=region_wgt_var,
                                   obs_dir=obs_dir,
                                   obs_file=obs_file,
-                                  reg_obs_file_suffix=reg_obs_file_suffix)
+                                  reg_obs_file_suffix=reg_obs_file_suffix,
+                                  vertical_levels=vertical_levels)
+
 PyAverager.run_pyAverager(pyAveSpecifier)
 
