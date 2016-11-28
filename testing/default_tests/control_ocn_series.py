@@ -6,8 +6,7 @@ import os
 #### User modify ####
 
 in_dir='/glade/p/tdd/asap/data/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/mon/tseries/'
-##out_dir= os.environ.get('RESULTS_DIR')+'/ocn/series/'
-out_dir= '/glade/scratch/aliceb/b.e12.B1850C5CN.ne30_g16.init.ch.027/ocn/series/'
+out_dir= os.environ.get('RESULTS_DIR')+'/ocn/series/'
 pref= 'b.e12.B1850C5CN.ne30_g16.init.ch.027.pop.h'
 htype= 'series'
 average = ['tavg:1:10','mavg:1:10','moc:1:10','mocm:1:10','hor.meanConcat:1:10']
