@@ -306,7 +306,8 @@ def set_slices_and_vars_time_series(directory, file_pattern, date_pattern, prefi
             series_list.add(var+'__meta')
         else:
             if if_char:
-                series_list.add(var+'__metaChar')
+                if if_variant == False:
+                    series_list.add(var+'__metaChar')
             else:
                 series_list.add(var+'__meta')
 
@@ -512,7 +513,10 @@ def check_if_series_var(f, vn, unlimited):
     if_char = False
     var = f.variables[vn]
 
-    if (vn == unlimited):
+    if (var.typecode() == 'S1' or var.typecode() == 'c'):
+        if_series = False
+        if_char = True
+    elif (vn == unlimited):
         if_series = True
     # if number of dims is less than or equal to one, not a series var
     elif (var.rank<2):
@@ -520,7 +524,7 @@ def check_if_series_var(f, vn, unlimited):
     # if it doesn't contain the unlimited dimension (time), not a series var
     elif (unlimited not in var.dimensions):
         if_series = False  
-    elif (var.typecode() == 'S1'):
+    elif (var.typecode() == 'S1' or var.typecode() == 'c'):
         if_series = False
         if_char = True
 
