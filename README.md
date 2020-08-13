@@ -3,7 +3,7 @@
 September 6, 2018
 
 
-### PyAverager
+# PyAverager
 
 
 A package used for computing averages from climate model output.
@@ -17,12 +17,12 @@ Copyright:  Contained within LICENSE.txt
 Comments and feedback:  mickelso@ucar.edu
 
 
-## What the PyAverager Can Do
+### What the PyAverager Can Do
 
 The PyAverager can create the climatology files needed by the AMWG, OMWG, Land, and Ice CESM diagnostic packages (the full list of averages is defined within the ‘Specification’ section).  It is able to compute averages from previously generated averages (such as monthly averages for season averages) or from scratch.  The PyAverager can operate on monthly time-slice and time-series files that exist in the same directory.
 
 
-## Dependencies
+### Dependencies
 
 The PyAverager depends on the PyNIO, mpi4py, and PyTools packages to be installed on your system.  PyNIO is needed for NetCDF file I/O.  mpi4py and PyTools are needed for the parallel communication, though it is possible to run the PyAverager in serial mode without mpi4py.  
 
@@ -38,7 +38,7 @@ PyTools: https://www2.cisl.ucar.edu/tdd/asap/parallel-python-tools-post-processi
 
 CESM Supported Machine Information (steps to take to get these packages into your path):
 
-Yellowstone:
+NCAR:
 Add the following to the top of your bsub script or execute them on the command line and then type module save to always keep them in your environment:
 
     module load python 
@@ -54,14 +54,16 @@ How To Install ASAP PyTools
     python setup.py install --user
 
 
-## Building and Installing the PyAverager
+### Building and Installing the PyAverager
 
-Check out the source code (3 options): 
+Check out the source code (2 options): 
+
     git clone https://github.com/sherimickelson/pyAverager
     pip install pyAverager --user 
 
 
 If checking out the code via svn or git, you must install the pyAverager (the pip method will install the package for you).
+
     cd PyAverager
     python setup.py install --user
 
@@ -71,7 +73,8 @@ Make sure the install location is added to your $PYTHONPATH
 You can also type python to get the interactive terminal and then type
 
     from pyaverager import PyAverager, specification
-    You will get an error if it is not in your path
+
+You will get an error if it is not in your path
 
 To install documentation, run:
     
@@ -80,9 +83,9 @@ To install documentation, run:
 The documentation will be created in the apidocs directory.
 
 
-## Running the Examples
+### Running the Examples
 
-Running the examples on Yellowstone:
+Running the examples on NCAR:
 (For other machines, you will need to create a queue submission script similar to examples/ runAvg_mpi.csh)
 
     cd examples
@@ -95,7 +98,7 @@ Running the examples on Yellowstone:
     bsub < runAvg_mpi.csh
 
 
-## Specification
+### Specification
 
 The PyAverager is a python library that is referenced from another python script.  In order to run the PyAverager, you need to specify parameters so the average knows what types of averages to compute, input/output locations, and any averaging options you would like to add.  The example directory contains several control_.py files that you can use as templates.  You can copy one of these scripts and modify the top section to fit your data.
 
@@ -108,57 +111,57 @@ Series:  $CASE.$comp.$stream.$var.$year1$month1-$year2$month2.nc
 (If your file names do not match this pattern, you will need to pass the file_pattern variable to the specifier)
 
 
-## Types of Averages
+### Types of Averages
 
 The table below lists the types of averages the PyAverager can compute. 
 
-Average Option	| Description	                | Output Name	           | Can be Weighted?   | Can Be Created As a Dependency?
----------------------------------------------------------------------------------------------------------------------------------
-| ya	        | Yearly Average	        | $CASE.$YEAR.nc	           | Yes 	        | No
-| tavg	        | Ocn average across years	| tavg.$Year1-$Year2.nc	           | Yes	        | Yes
-| annall	| Land model, annual averages, concat together| $CASE_ANN_ALL.nc   | Yes	        | Yes
-| moc	        | Ocn MOC file	                | $CASE_moc.nc	                   | Yes	        | Yes
-| hor.meanyr	| Ocn hor.mean year file	| $REG_hor.meanyr.$YEAR.nc	   | Yes	        | Yes
-| hor.meanConcat | Ocn, concat of hor.meayr	| $REG_hor_mean_hor.meanConcat.$CASE.$Year1-$Year2.nc| Yes| Yes
-| mocm	        | Ocn MOCM	                | $CASE_mocm.nc	                   | No	                | No
-| ann	        | Annual Average	        | $CASE_ANN_climo.nc	           | Yes	        | Yes
-| djf	        | Winter Average	        | $CASE_DJF_climo.nc	           | Yes	        | Yes
-| mam	        | Spring Average	        | $CASE_MAM_climo.nc	           | Yes	        | Yes
-| jja	        | Summer Average	        | $CASE_JJA_climo.nc	           | Yes	        | Yes
-| son	        | Fall Average	                | $CASE_SON_climo.nc	           | Yes	        | Yes
-| jan	        | January Average	        | $CASE_01_climo.nc	           | Yes	        | Yes
-| feb	        | February Avg	                | $CASE_02_climo.nc	           | Yes	        | Yes
-| mar	        | March Average	                | $CASE_03_climo.nc	           | Yes	        | Yes
-| apr	        | April Average	                | $CASE_04_climo.nc	           | Yes	        | Yes
-| may	        | May Average	                | $CASE_05_climo.nc	           | Yes	        | Yes
-| jun	        | June Average	                | $CASE_06_climo.nc	           | Yes	        | Yes
-| jul	        | July Average	                | $CASE_07_climo.nc	           | Yes	        | Yes
-| aug	        | August Average	        | $CASE_08_climo.nc	           | Yes	        | Yes
-| sep	        | Sept Average	                | $CASE_09_climo.nc	           | Yes	        | Yes
-| oct	        | Oct Average	                | $CASE_10_climo.nc	           | Yes	        | Yes
-| nov	        | Nov Average	                | $CASE_11_climo.nc	           | Yes	        | Yes
-| dec	        | Dec Average	                | $CASE_12_climo.nc	           | Yes	        | Yes
-| mavg	        | Concat of all monthly averages| mavg.$Year1-$Year2.nc	           | No	                | Yes
+|Average Option	| Description	                | Output Name	           | Can be Weighted?   | Can Be Created As a Dependency?|
+| :---        |:---        | :---        | :---        | :---        | 
+| ya	        | Yearly Average	        | $CASE.$YEAR.nc	           | Yes 	        | No|
+| tavg	        | Ocn average across years	| tavg.$Year1-$Year2.nc	           | Yes	        | Yes|
+| annall	| Land model, annual averages, concat together| $CASE_ANN_ALL.nc   | Yes	        | Yes|
+| moc	        | Ocn MOC file	                | $CASE_moc.nc	                   | Yes	        | Yes|
+| hor.meanyr	| Ocn hor.mean year file	| $REG_hor.meanyr.$YEAR.nc	   | Yes	        | Yes|
+| hor.meanConcat | Ocn, concat of hor.meayr	| $REG_hor_mean_hor.meanConcat.$CASE.$Year1-$Year2.nc| Yes| Yes|
+| mocm	        | Ocn MOCM	                | $CASE_mocm.nc	                   | No	                | No|
+| ann	        | Annual Average	        | $CASE_ANN_climo.nc	           | Yes	        | Yes|
+| djf	        | Winter Average	        | $CASE_DJF_climo.nc	           | Yes	        | Yes|
+| mam	        | Spring Average	        | $CASE_MAM_climo.nc	           | Yes	        | Yes|
+| jja	        | Summer Average	        | $CASE_JJA_climo.nc	           | Yes	        | Yes|
+| son	        | Fall Average	                | $CASE_SON_climo.nc	           | Yes	        | Yes|
+| jan	        | January Average	        | $CASE_01_climo.nc	           | Yes	        | Yes|
+| feb	        | February Avg	                | $CASE_02_climo.nc	           | Yes	        | Yes|
+| mar	        | March Average	                | $CASE_03_climo.nc	           | Yes	        | Yes|
+| apr	        | April Average	                | $CASE_04_climo.nc	           | Yes	        | Yes|
+| may	        | May Average	                | $CASE_05_climo.nc	           | Yes	        | Yes|
+| jun	        | June Average	                | $CASE_06_climo.nc	           | Yes	        | Yes|
+| jul	        | July Average	                | $CASE_07_climo.nc	           | Yes	        | Yes|
+| aug	        | August Average	        | $CASE_08_climo.nc	           | Yes	        | Yes|
+| sep	        | Sept Average	                | $CASE_09_climo.nc	           | Yes	        | Yes|
+| oct	        | Oct Average	                | $CASE_10_climo.nc	           | Yes	        | Yes|
+| nov	        | Nov Average	                | $CASE_11_climo.nc	           | Yes	        | Yes|
+| dec	        | Dec Average	                | $CASE_12_climo.nc	           | Yes	        | Yes|
+| mavg	        | Concat of all monthly averages| mavg.$Year1-$Year2.nc	           | No	                | Yes|
 | mons	        | Lnd, concat of monthly averages| $CASE_MONS_climo.nc	           | No	                | Yes
-| jfm	        | Ice Winter Avg	        | $CASE_jfm_climo.nc	           | Not Now	        | Yes
-| fm	        | Ice Feb & Mar Avg	        | $CASE_fm_climo.nc	           | Not Now	        | Yes
-| amj	        | Ice Spring Avg	        | $CASE_amj_climo.nc	           | Not Now	        | Yes
-| jas	        | Ice Summer Avg	        | $CASE_jas_climo.nc	           | Not Now	        | Yes
-| ond	        | Ice Fall Avg	                | $CASE_ond_climo.nc	           | Not Now	        | Yes
-| on	        | Ice Oct & Nov Avg	        | $CASE_on_climo.nc	           | Not Now	        | Yes
-| preproc	| Ice pre proc file	        | ice_vol$CASE_$Year1-$Year2.nc	   | Not Now	        | Yes
+| jfm	        | Ice Winter Avg	        | $CASE_jfm_climo.nc	           | Not Now	        | Yes|
+| fm	        | Ice Feb & Mar Avg	        | $CASE_fm_climo.nc	           | Not Now	        | Yes|
+| amj	        | Ice Spring Avg	        | $CASE_amj_climo.nc	           | Not Now	        | Yes|
+| jas	        | Ice Summer Avg	        | $CASE_jas_climo.nc	           | Not Now	        | Yes|
+| ond	        | Ice Fall Avg	                | $CASE_ond_climo.nc	           | Not Now	        | Yes|
+| on	        | Ice Oct & Nov Avg	        | $CASE_on_climo.nc	           | Not Now	        | Yes|
+| preproc	| Ice pre proc file	        | ice_vol$CASE_$Year1-$Year2.nc	   | Not Now	        | Yes |
 
 
-## Can be created as a dependency? option:
+### Can be created as a dependency? option:
 
 The averages that are listed in the above table as being able to create averages as dependencies have the ability to use previously calculated averages to calculate a new average.  To use this option, append dep_ in front of the average name (ie, dep_jja).  Without dep_, a jja average would loop over all June, July, and August values within the year ranges and create an average.  With dep_, the PyAverager will create and output a June average, July average, and August average.  Then it will open these average files and average these values to create the jja average file.  In most cases, it is faster to run with dep_, but it should be pointed out that the answers between using and not using the dep_ option will differ due to order of operation.
 
 
-## Specifier Arguements
+### Specifier Arguements
 
 See examples/control.py for how to set all available options to send to the create_specifier function.  
 
-# Variables that must be passed to the specification.create_specifier class:
+#### Variables that must be passed to the specification.create_specifier class:
 
     in_directory:  directory where the input data is located
     out_directory: directory where the output will be produced
@@ -167,10 +170,12 @@ See examples/control.py for how to set all available options to send to the crea
     date_pattern: 'yyyymm-yyyymm'
     avg_list: a list of averages to compute   DEFAULT = Empty List
 
-Format:   ['ya:1850','mavg:1850:1890']  ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table. 
+Format:   ['ya:1850','mavg:1850:1890']  
+
+ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table. 
 
 
-# Variables that are mandatory for the Ice and Ocean Diags:
+#### Variables that are mandatory for the Ice and Ocean Diags:
 
 The following variables are used by the Ocean Model Diags for the hor.meanConcat file creatation:
 
@@ -188,12 +193,13 @@ The following variables are used by the Ice Model Diags for the Pre_Proc file:
     ncl_location: the location of the ncl script used to create the reg_file (usually provided with this source code in pyaverager/ directory 
     reg_file:  the name of the netcdf file that contains the region mask information.  If it does not exist, it will be created for you.
 
-# Optional variables that can be passed to the specification.create_specifier class:  
+#### Optional variables that can be passed to the specification.create_specifier class:  
 
     ncformat: either 'netcdf4c' (netcdf4 compressed (lev=1)), 'netcdf4' (netcdf classic), and  'netcdf' (netcdf3 classic)  DEFAULT = 'netcdf4c'
     file_pattern: needed for non-cesm data
 
 For file name: tasmax_Amon_GFDL-FLORB01_FLORB01-P1-ECDA-v3.1-011980_r10i1p1_198001-198012.nc
+
 Use: ['$var','_','$prefix','_','$m_id','_','$date_pattern','.','$suffix']
 
     hist_type: either slice or series   DEFAULT = 'slice'
@@ -212,7 +218,7 @@ DEFAULT = False
     vertical_levels:  Number of ocean vertical levels  DEFAULT = 60
 
 
-# To generate the obs file needed for the Ocean hor.meandiff calculation:
+#### To generate the obs file needed for the Ocean hor.meandiff calculation:
 (or NCAR users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
 
 Required: 
@@ -243,7 +249,7 @@ Directions:
     ncatted -a _FillValue,REGION_MASK,o,i,99 obs.nc
 
 
-# To generate the regional obs files needed for the Ocean hor.meandiff calculation:
+#### To generate the regional obs files needed for the Ocean hor.meandiff calculation:
 
 (or NCAR users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
 
@@ -273,14 +279,14 @@ For regions in the table below:
    
 Region Table
 | Sou	| Pac	| Ind	| Atl	| Lab	| Gin	| Arc	| Hud | 
----------------------------------------------------------------
+:---        | :---        | :---        | :---        | :---        | :---        | :---        | :---        | 
 | 1	| 2	| 3	| 6	| 8	| 9	| 10	| 11  |
 
 For Glo:
     ncwa -m REGION_MASK -T gt -M 0 -w TAREA -a nlon,nlat -v TEMP,SALT obs.nc Glo_hor_mean_obs.nc
 
 
-## PyAverager Error Codes
+### PyAverager Error Codes
 
     errors 1-19:  average list errors
     1: Listed average is not in the know average list
