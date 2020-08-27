@@ -16,7 +16,7 @@ Created on November 20, 2014
 '''
 
 average_types = {
-    'ya':{'months_to_average':[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 
+    'ya':{'months_to_average':[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         'type':'yearly average', 'fn':'nc',
         'weights':[0.08493150770664215, 0.07671232521533966, 0.08493150770664215, 0.08219178020954132,
                    0.08493150770664215, 0.08219178020954132, 0.08493150770664215, 0.08493150770664215,
@@ -37,7 +37,7 @@ average_types = {
         'weights':[0.08493150770664215, 0.07671232521533966, 0.08493150770664215, 0.08219178020954132,
                    0.08493150770664215, 0.08219178020954132, 0.08493150770664215, 0.08493150770664215,
                    0.08219178020954132, 0.08493150770664215, 0.08219178020954132, 0.08493150770664215],
-	'depend':['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'], 'depend_type': 'month'},
+        'depend':['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'], 'depend_type': 'month'},
     'mocm':{'months_to_average':[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'type':'monthly moc', 'fn':'mocm.nc','depend_type':'month'},
     'ann_sig':{'months_to_average':[0], 'type':'seasonal average-significance, ann', 'fn':'_ANN_climo.nc',
                'depend':['ann'],'depend_type': 'year'},
@@ -58,7 +58,7 @@ average_types = {
     'jja_mean':{'months_to_average':[0], 'type':'seasonal mean-significance, jja', 'fn':'_JJA_means.nc',
                'depend':['jja'],'depend_type': 'year'},
     'son_mean':{'months_to_average':[0], 'type':'seasonal mean-significance, son', 'fn':'_SON_means.nc',
-               'depend':['son'],'depend_type': 'year'}, 
+               'depend':['son'],'depend_type': 'year'},
     'djf':{'months_to_average':[11, 0, 1], 'type':'season average, djf', 'fn':'_DJF_climo.nc',
         'weights':[0.3444444537162781, 0.3444444537162781, 0.3111111223697662],
         'depend':['dec', 'jan', 'feb'], 'depend_type': 'month'},
@@ -70,7 +70,7 @@ average_types = {
              'depend':['jun', 'jul', 'aug'], 'depend_type': 'month'},
     'son':{'months_to_average':[8, 9, 10], 'type':'season average, son', 'fn':'_SON_climo.nc',
              'weights':[0.32967033, 0.34065934, 0.32967033],
-	     'depend':['sep', 'oct', 'nov'], 'depend_type': 'month'},
+             'depend':['sep', 'oct', 'nov'], 'depend_type': 'month'},
     'jan':{'months_to_average':[0], 'type':'monthly average, jan', 'fn':'_01_climo.nc'},
     'next_jan':{'months_to_average':[0], 'type':'monthly average, next jan', 'fn':'next_01_climo.nc'},
     'feb':{'months_to_average':[1], 'type':'monthly average, feb', 'fn':'_02_climo.nc'},
@@ -129,7 +129,7 @@ def average_compliance(avg_list):
             new_ave = new_ave+':'+yr1
         avg_list[avg_list.index(ave)] = new_ave
         ave = new_ave
-           
+
         # Set average name and flag if it's a depend average
         if 'dep' in ave_type:
             ave_name = ave_type[4:]
@@ -164,27 +164,27 @@ def average_compliance(avg_list):
 
         # Is average type in list
         if ave_name not in ave_t.average_types:
-            print 'ERROR: ', ave, 'is not in the list of know averages. Exiting.'
+            print('ERROR: {} is not in the list of know averages. Exiting.'.format(ave))
             sys.exit(1)
-  
+
         # If variable is added avg list as a depend, make sure it can be created this way
         if dep:
             if 'depend' not in ave_t.average_types[ave_name]:
-                print 'ERROR: ', ave, 'cannot be created with dependencies.  Please remove \'dep_\' and rerun.  Exiting.'
+                print('ERROR: {} cannot be created with dependencies.  Please remove \'{}\' and rerun.  Exiting.'.format(ave, dep))
                 sys.exit(2)
 
         # Check to see if average has correct number of arguments
         if ave_name == 'ya':
             if len(ave_descr) != 2:
-                print 'ERROR: ', ave, ' must be formatted avg_type:year.  Exiting.'
+                print('ERROR: {} must be formatted avg_type:year.  Exiting.'.format(ave))
                 sys.exit(3)
-                
+
         else:
             if (len(ave_descr) != 3):
-                print 'ERROR: ', ave, ' must be formatted avg_type:start_year:end_year.  Exiting.'
+                print ('ERROR: {} must be formatted avg_type:start_year:end_year.  Exiting.'.format(ave))
                 sys.exit(4)
 
-    print 'Average list complies with standards.'
+    print('Average list complies with standards.')
 
 def sort_depend(avg_list, i, directory, prefix, regions):
 
@@ -219,7 +219,7 @@ def sort_depend(avg_list, i, directory, prefix, regions):
         for ave in avg_list[i]:
             ave_descr = ave.split(':')
             short_type_list.append(ave_descr[0])
-            type_list.append(ave) 
+            type_list.append(ave)
             if 'djf' in ave_descr[0] and '_sig' not in ave_descr[0] and '_mean' not in ave_descr[0]:
                 avg_list[i].append('prev_dec'+ave[len(ave_descr[0]):])
                 avg_list[i].append('next_jan'+ave[len(ave_descr[0]):])
@@ -246,7 +246,7 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                             if category[0] in ave_2:
                                 ave_descr_2 = ave_2.split(':')
                                 if 'dep' in ave_2:
-                                    print 'Remove from ',level,':',ave_2
+                                    print( 'Remove from {} : {}'.format(level,ave_2))
                                     #print avg_list
                                     #avg_list[level].remove(ave_2)
                                 else:
@@ -268,14 +268,14 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                             if '_' in depend:
                                 split_ave = depend.split('_')
                                 ave_n = split_ave[1]
-                            else:                           
+                            else:
                                 ave_n = depend
                             new_ave = ave_t.average_types[ave_n]
                             new_file = directory + '/' + climFileIO.get_out_fn(ave_n,prefix, string.zfill(str(yr),4),new_ave['fn'],reg='null')
                             if not os.path.isfile(new_file):
                                 temp_missing.append(depend_plus_date)
                             else:
-                                print 'Using: ', new_file
+                                print ('Using: {}'.format(new_file))
                 else:
                     depend_plus_date = depend+ave[len(ave_descr[0]):]
                     if depend_plus_date not in type_list:
@@ -290,9 +290,10 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                             if not os.path.isfile(new_file):
                                 temp_missing.append(depend_plus_date)
                             else:
-                                print 'Using: ', new_file
+                                print ('Using: {}'.format(new_file))
+
                         else: # average is in the list, but different date range, flag as an error for now
-                            print "ERROR: Need to add ",depend_plus_date," to average list for ",ave,", but another",depend, "has already been added with a different date range.  Only one may exist. Exiting."
+                            print( "ERROR: Need to add {} to average list for {}, but another {} has already been added with a different date range.  Only one may exist. Exiting.".format(depend_plus_date, ave, depend))
                             sys.exit(5)
         missing = set(temp_missing)
         avg_list[i] = avg_list[i] + list(missing)
@@ -309,14 +310,13 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                         if not os.path.isfile(new_file):
                             new_avg_list.append(ave_descr_2[0][:]+"_"+str(region)+ave_2[len(ave_descr_2[0]):])
                         else:
-                            print 'Using: ',new_file
+                            print( 'Using: {}'.format(new_file))
                 else:
                     new_avg_list.append(ave_descr_2[0][:]+ave_2[len(ave_descr_2[0]):])
             avg_list[level] = new_avg_list
-       
+
         # Go through avg_list and remove levels that do not contain any averages in them
         for i in range(0,len(avg_list)):
             if len(avg_list[i]) is 0:
                 del avg_list[i]
         return avg_list
-
