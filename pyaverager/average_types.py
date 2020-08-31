@@ -241,7 +241,7 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                 new_depend = [s for s in ave_t.average_types[ave_type]['depend'] if 'dep' in s]
                 if len(new_depend) > 0:
                     category = ave_descr[0][4:].split('.')
-                    for level,ave_list in avg_list_copy.iteritems():
+                    for level,ave_list in avg_list_copy.items():
                         for ave_2 in ave_list:
                             if category[0] in ave_2:
                                 ave_descr_2 = ave_2.split(':')
@@ -299,13 +299,13 @@ def sort_depend(avg_list, i, directory, prefix, regions):
         avg_list[i] = avg_list[i] + list(missing)
         return sort_depend(avg_list,i,directory,prefix,regions)
     else:
-        for level,ave_list in avg_list.iteritems():
+        for level,ave_list in avg_list.items():
             new_avg_list = []
             for ave_2 in ave_list:
                 ave_descr_2 = ave_2.split(':')
                 if 'hor' in ave_2:
                     #print ave_2, prefix,ave_descr_2,ave_t.average_types[ave_descr_2[0]]['fn'],regions
-                    for region,name in regions.iteritems():
+                    for region,name in regions.items():
                         new_file = directory + '/' + climFileIO.get_out_fn(ave_2,prefix,ave_2[len(ave_descr_2[0]):],ave_t.average_types[ave_descr_2[0]]['fn'],str(region))
                         if not os.path.isfile(new_file):
                             new_avg_list.append(ave_descr_2[0][:]+"_"+str(region)+ave_2[len(ave_descr_2[0]):])
