@@ -1,11 +1,10 @@
 import Nio
 from asaptools import partition
-import rover
-import climFileIO
+from . import rover, climFileIO
 import numpy as np
 import os
 from numpy import ma as MA
-import average_types as ave_t
+from . import average_types as ave_t
 
 def run_pre_proc(spec):
 
