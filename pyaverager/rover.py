@@ -435,7 +435,7 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
 
     '''
 
-    import average_types as ave_t
+    from . import average_types as ave_t
     import string
 
     yr1_str = "{:04d}".format(start_yr)
