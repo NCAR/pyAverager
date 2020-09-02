@@ -361,9 +361,9 @@ def set_slices_and_vars_time_slice(directory, file_pattern, prefix, suffix, star
             # Check to see if the file exists before adding info to dictionary
             startIndex = 0 # Slice index will always be 1 in history time slice files
             #file_prefix = directory+"/"+prefix
-            yrS = str(yr)
-            mS = str(m)
-            stamp = "{:04d}-{:02d}".format(yrS,mS)
+            yrS = "{:04d}".format(yr)
+            mS = "{:02d}".format(m)
+            stamp = "{}-{}".format(yrS,mS)
             filename,file_prefix = get_slice_fn(file_pattern, directory, prefix, suffix, stamp)
             filename = directory+"/"+filename
             if (os.path.isfile(filename)):
@@ -439,7 +439,7 @@ def set_slices_and_vars_depend(directory, file_pattern, prefix, start_yr, end_yr
     import string
 
     yr1_str = "{:04d}".format(start_yr)
-    yr2_str = "{:04d}".format.(end_yr)
+    yr2_str = "{:04d}".format(end_yr)
 
     hist_dict = {}
     if (ave_type['depend_type'] == 'month'):
