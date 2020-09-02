@@ -37,7 +37,7 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
     timer.start("Time to compute Average")
 
     # Get a sample month/file to look into to see if the variable contains missing values
-    #sample_month = next(iter(file_dict.values()).next().itervalues())
+    #sample_month = next(iter(file_dict.values()).next().values())
     sample_month = file_dict[years[0]][ave_info['months_to_average'][0]]
 
     # If the variable has missing values, we need to calculate the average
@@ -192,7 +192,7 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
     first = True
 
     # Create the sum of all slices
-    sample_month = next(iter(file_dict.values()).next().itervalues())
+    sample_month = next(iter(file_dict.values()).next().values())
     sample_fn = hist_dict[years[0]][0]['fn']
 
     # If the variable has missing values, we need to calculate the average differently
