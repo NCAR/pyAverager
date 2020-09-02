@@ -1,5 +1,5 @@
 import Nio
-import climFileIO
+from . import climFileIO
 import numpy as np
 from numpy import ma as MA
 import os

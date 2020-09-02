@@ -116,7 +116,7 @@ def average_compliance(avg_list):
     '''
 
     import sys
-    import average_types as ave_t
+    from . import average_types as ave_t
 
     for ave in avg_list:
         ave_descr = ave.split(':')
@@ -206,8 +206,8 @@ def sort_depend(avg_list, i, directory, prefix, regions):
 
     import sys,copy,os
     import string
-    import average_types as ave_t
-    import climFileIO
+    from . import average_types as ave_t
+    from . import climFileIO
 
     dependencies = [s for s in avg_list[i] if 'dep' in s]
     #print 'Start: ',avg_list
@@ -271,7 +271,7 @@ def sort_depend(avg_list, i, directory, prefix, regions):
                             else:
                                 ave_n = depend
                             new_ave = ave_t.average_types[ave_n]
-                            new_file = directory + '/' + climFileIO.get_out_fn(ave_n,prefix, string.zfill(str(yr),4),new_ave['fn'],reg='null')
+                            new_file = directory + '/' + climFileIO.get_out_fn(ave_n,prefix, "{:04d}".format(yr),new_ave['fn'],reg='null')
                             if not os.path.isfile(new_file):
                                 temp_missing.append(depend_plus_date)
                             else:

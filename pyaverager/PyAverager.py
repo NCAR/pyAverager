@@ -47,11 +47,9 @@ class PyAverager(object):
                              that define which averages to compute, directories, file prefixes, etc
         """
         import os,sys
-        import rover
-        import climAverager
-        import climFileIO
-        import average_types as ave_t
-        import regionOpts
+        from . import rover, climAverager, climFileIO
+        from . import average_types as ave_t
+        from . import regionOpts
         import string
         import collections
         from asaptools import timekeeper
@@ -174,13 +172,15 @@ class PyAverager(object):
 
                     # split mpi comm world
                     temp_color = (rank // min_procs_per_ave) % num_of_avg
-                    num_of_groups = size/min_procs_per_ave
+                    num_of_groups = int(size/min_procs_per_ave)
                     if (temp_color == num_of_groups):
                         temp_color = temp_color - 1
+                    print("num_of_groups {} temp_color {} size {} rank {} min_procs_per_ave{}".format(num_of_groups, temp_color,size,rank,min_procs_per_ave))
                     groups = []
                     for g in range(0,num_of_groups):
                         groups.append(g)
                     #print 'g_rank:',rank,'size:',size,'#of ave:',num_of_avg,'min_procs:',min_procs_per_ave,'temp_color:',temp_color,'#of groups',num_of_groups,'groups:',groups
+
                     group = groups[temp_color]
                     inter_comm,multi_comm = spec.main_comm.divide(group)
                     color = inter_comm.get_color()
@@ -283,11 +283,11 @@ class PyAverager(object):
                         # Create and define the average file
                         timer.start("Create/Define Netcdf File")
                         if (len(ave_descr)<3 or 'hor.meanyr' in ave_descr):
-                            ave_date = string.zfill(ave_descr[1],4)
+                            ave_date = "{:04d}".format(ave_descr[1])
                             ave_date2 = str(ave_descr[1])
                         else:
-                            date1 = string.zfill(ave_descr[1],4)
-                            date2 = string.zfill(ave_descr[2],4)
+                            date1 = "{:04d}".format(ave_descr[1])
+                            date2 = "{:04d}".format(ave_descr[2])
                             ave_date = date1+'-'+date2
                             ave_date2 = str(ave_descr[1])+'-'+str(ave_descr[2])
                         outfile_name = climFileIO.get_out_fn(ave_descr[0],prefix,ave_date,ave_t.average_types[ave_descr[0]]['fn'],region_name)

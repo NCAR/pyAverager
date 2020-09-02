@@ -1,7 +1,7 @@
 import time
 import numpy as np
-import rover
-import climFileIO
+from . import rover
+from . import climFileIO
 from numpy import ma as MA
 
 def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
