@@ -1,0 +1,16 @@
+name: pyreshaper
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bumpversion
+  - codecov
+  - coverage
+  - mpi4py
+  - netcdf4
+  - pip
+  - pynio
+  - pytest
+  - pytest-cov
+  - pip:
+    - asaptools

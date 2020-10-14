@@ -1,4 +1,4 @@
-import Nio
+import netCDF4 as nc
 import time,os,sys
 import numpy as np
 
@@ -7,7 +7,7 @@ import numpy as np
 ____________________________
 Created on November 20, 2014
 
-@author: Sheri Mickelson <mickelso@ucar.edu> 
+@author: Sheri Mickelson <mickelso@ucar.edu>
 '''
 #==============================================================================
 #
@@ -25,12 +25,12 @@ def open_file(var, month_dict, split, mess='None'):
     @param month_dict   A dictionary that contains all file references for that year.
 
     @param split        Look to see if the there is a split name in the file.
-  
+
     @param mess         Optional:  To print an open message.
 
     @return my_file     Returns a file pointer to the newly opened file.
     '''
-    # Parse the filename and datestamp out of the 
+    # Parse the filename and datestamp out of the
     #i_prefix = month_dict['fn']
     #date_stamp = month_dict['date_stamp']
     i_fn = month_dict['directory']+'/'+month_dict['fn']
@@ -51,14 +51,14 @@ def open_file(var, month_dict, split, mess='None'):
                     i_fn = i_fn + month_dict['suffix']
                 else:
                     i_fn = i_fn + p
-            #print 'Opening: ',i_fn 
+            #print 'Opening: ',i_fn
             if not (os.path.isfile(i_fn)):
-                print("ERROR: Cannot find ",i_fn,".  Exiting.") 
-                sys.exit(20) 
+                print(("ERROR: Cannot find ",i_fn,".  Exiting."))
+                sys.exit(20)
     # Open the original netcdf file
     if ('None' not in mess):
-        print 'Opening: ',mess, i_fn
-    my_file = Nio.open_file(i_fn,"r")
+        print(('Opening: '+mess+ i_fn))
+    my_file = nc.Dataset(i_fn,"r")
     return my_file
 
 
@@ -74,7 +74,7 @@ def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,f
 
     @param years               A list of the years the average spans.
 
-    @param var		       For timeseries files, this indicates which file needs to be opened.
+    @param var                 For timeseries files, this indicates which file needs to be opened.
 
     @param split               Split filename indicator
 
@@ -84,11 +84,11 @@ def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,f
 
     @returns file_dict         Dictionary that contains all of the file pointers searchable by year/month.
 
-    @returns open_list         A list of all of the open files           
+    @returns open_list         A list of all of the open files
     '''
     # for each year and month that's needed for this average, open the file where that
     # slice is found
-    file_dict = {} 
+    file_dict = {}
     open_list = []
     last_opened_date = 'null'
     last_opened_file = 'null'
@@ -96,11 +96,11 @@ def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,f
     # check to see if we need to open an extra year
     if(ave_type == 'djf'):
         prev_year = int(years[0])-1
-        if (prev_year in hist_dict.keys()):
+        if (prev_year in list(hist_dict.keys())):
             if (len(hist_dict[years[0]-1])<1):
                 last_index = len(years)-1
                 if (len(hist_dict[years[last_index]+1])<2):
-                    print 'ERROR: In order to calculate DJF, you must have either December',str(years[0]-1),'or January and February',str(years[last_index]+1),'.  Exiting'
+                    print(('ERROR: In order to calculate DJF, you must have either December'+str(years[0]-1)+'or January and February'+str(years[last_index]+1)+'.  Exiting'))
                     sys.exit(21)
     if((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
@@ -115,10 +115,10 @@ def open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,f
         for m in months_to_average:
             if (m in hist_dict[yr]):
                 if (hist_dict[yr][m]['date_stamp'] == last_opened_date):
-                    monthly_dict[m]={'fp':last_opened_file} 
+                    monthly_dict[m]={'fp':last_opened_file}
                 else:
                     f = open_file(var,hist_dict[yr][m],split)
-                    monthly_dict[m]={'fp':f} 
+                    monthly_dict[m]={'fp':f}
                     open_list.append(f)
                     last_opened_date = hist_dict[yr][m]['date_stamp']
                     last_opened_file = f
@@ -134,12 +134,12 @@ def close_all_files(open_list):
     '''
     # for each year and month that was opened, close
     for f in open_list:
-        Nio.close(f)    
+        f.close()
 
 def open_file_return_var(fn, var):
 
     '''
-    Opens a netCDF file and returns the full variable. 
+    Opens a netCDF file and returns the full variable.
 
     @params fn       The netCDF filename to open.
 
@@ -148,8 +148,8 @@ def open_file_return_var(fn, var):
     @return var_val  The values for the netCDF variable.
     '''
 
-    # Open the original netcdf file 
-    my_file = Nio.open_file(fn,"r")
+    # Open the original netcdf file
+    my_file = nc.Dataset(fn,"r")
 
     # Get variable
     var_hndl = my_file.variables[var]
@@ -164,7 +164,7 @@ def open_file_return_var(fn, var):
 #==============================================================================
 
 def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
-    
+
     '''
     Puts together the correct output/average filename.
 
@@ -176,7 +176,7 @@ def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
 
     @param suffix         The suffix to be appended to the end of the output/average file.
 
-    @param reg		  Used by regional averages.  If not a regional average, -99 is passed
+    @param reg            Used by regional averages.  If not a regional average, -99 is passed
 
     @return outfile_name  The output/average filename.
     '''
@@ -196,7 +196,7 @@ def get_out_fn(ave_type, prefix, date, suffix, reg=-99):
     return outfile_name
 
 def create_ave_file(my_file,outfile,hist_string,ncformat,years,collapse_dim=''):
- 
+
     '''
     Opens up/Creates a new file to put the computed averages into.
 
@@ -208,47 +208,44 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years,collapse_dim=''):
 
     @param ncformat      Format to write the NetCDF file out as.
 
-    @param collapse_dim  Dimension to collapse across 
+    @param collapse_dim  Dimension to collapse across
 
     @return new_file     Returns a file pointer to the newly opened file.
     '''
     dims = my_file.dimensions
-    attr = my_file.attributes
+    attr = my_file.ncattrs()
     vars = {}
 
     new_file_name = outfile
-    # Set pyNIO netcdf file options
-    opt = Nio.options()
     # The netcdf output format
-    if (ncformat == 'netcdf4c'):
-        opt.Format = 'NetCDF4Classic' 
-        opt.CompressionLevel = 1
+    if ('netcdf4c' in ncformat):
+        Format = 'NETCDF4_CLASSIC'
+        if (ncformat[-1].isdigit()):
+            self.compressionLevel = ncformat[-1]
     elif (ncformat == 'netcdf4'):
-        opt.Format = 'NetCDF4Classic'
+        Format = 'NETCDF4_CLASSIC'
     elif (ncformat == 'netcdf'):
-        opt.Format  = 'Classic'
+        Format  = 'NETCDF3_CLASSIC'
     elif (ncformat == 'netcdfLarge'):
-        opt.Format = '64BitOffset'
+        Format = 'NETCDF3_64BIT'
     else:
-        print "WARNING: Seltected netcdf file format (",ncformat,") is not recongnized."
-        print "Defaulting to netcdf3Classic format."
-        opt.Format  = 'Classic'
-    opt.PreFill = False
-    new_file = Nio.open_file(new_file_name, "w", options=opt, history=hist_string)
+        print(("WARNING: Selected netcdf file format ({}) is not recongnized.".format(ncformat)))
+        print("Defaulting to netcdf4Classic format.")
+        Format  = 'NETCDF4_CLASSIC'
+    new_file = nc.Dataset(new_file_name, "w", format=Format)
     #setattr(new_file,'yrs_averaged',years)
- 
+
     # Create attributes, dimensions, and variables
-    for n,v in attr.items():
-        if n=='history':
-            v = hist_string + '\n' + v 
+    if 'history' in attr:
+        v = hist_string + '\n' + getattr(my_file, 'history')
         setattr(new_file,n,v)
-    for var_d,l in dims.items():
+    for var_d,l in list(dims.items()):
         if var_d == "time":
-            if "time" not in collapse_dim: 
-                new_file.create_dimension(var_d, None)
+            if "time" not in collapse_dim:
+                new_file.createDimension(var_d, None)
         else:
             if var_d not in collapse_dim:
-                new_file.create_dimension(var_d,l)
+                new_file.createDimension(var_d,len(l))
     setattr(new_file,'yrs_averaged',years)
     return new_file
 
@@ -268,15 +265,15 @@ def create_meta_var(my_file, var_name, new_file,collapse_dim=''):
     '''
 
     var_hndl = my_file.variables[var_name]
-    typeCode = var_hndl.typecode()
+    typeCode = var_hndl.datatype
 
     dimnames = []
     for dimn in var_hndl.dimensions:
         if dimn not in collapse_dim:
             dimnames.append(dimn)
-    temp = new_file.create_variable(var_name,typeCode,tuple(dimnames))
-    for ka,va in var_hndl.attributes.items():
-        setattr(temp,ka,va)
+    temp = new_file.createVariable(var_name,typeCode,tuple(dimnames))
+    for ka,va in list(var_hndl.ncattrs().items()):
+        temp.setncattr(ka,va)
 
     return temp
 
@@ -298,10 +295,10 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
 
     @return temp     A variable pointer.
     '''
-    temp = new_file.create_variable(var_name,typeCode,tuple(dimnames))
-    for ka,va in attr.items():
-      if ka != 'scale_factor':
-          setattr(temp,ka,va)
+    temp = new_file.createVariable(var_name,typeCode,tuple(dimnames))
+    for ka,va in list(attr.items()):
+        if ka != 'scale_factor':
+            temp.setncattr(ka,va)
 
     return temp
 
@@ -324,21 +321,21 @@ def get_var_info(my_file, var_name, ave_descr, collapse_dim=''):
     '''
 
     var_hndl = my_file.variables[var_name]
-    typeCode = var_hndl.typecode()
+    typeCode = var_hndl.datatype
 
     dimnames = []
-    for dimn in var_hndl.dimensions:
+    for name,dim in var_hndl.dimensions.items():
         if('preproc' in ave_descr):
-            if (my_file.unlimited(dimn)):
-                dimnames.append(dimn)
+            if (dim.isunlimited()):
+                dimnames.append(name)
         else:
-            if dimn not in collapse_dim:
-                dimnames.append(dimn)
-    return typeCode,dimnames,var_hndl.attributes
+            if name not in collapse_dim:
+                dimnames.append(name)
+    return typeCode,dimnames,var_hndl.ncattrs()
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
                         outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
-			endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None,collapse_dim=''):
+                        endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None,collapse_dim=''):
 
     '''
     The function controls the defining of a new NetCDF file.
@@ -376,7 +373,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
     @param month         Indicates which month index of the file to open to retreive meta/dimensional values
 
     @param key           A variable to use that has a specific file attached to that name.
-                         Used as the file to retreive meta data from. 
+                         Used as the file to retreive meta data from.
 
     @param clobber       Boolean to remove an already existing average file.
 
@@ -388,7 +385,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
 
     @param pre_proc_variable Optional:  (used in the pre_proc calculations) variable names that need to be created.
 
-    @param collapse_dim Optional: dimension to collapse/average on 
+    @param collapse_dim Optional: dimension to collapse/average on
 
     @return all_files_vars  All of the variable pointers.
 
@@ -402,12 +399,12 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
 
     yr = int(ave_descr[1])
 
-    # Open/create the average files.  Then get variable information from other procs and add these variables to the files. 
+    # Open/create the average files.  Then get variable information from other procs and add these variables to the files.
     if serial or l_master:
     # We need to retreive coord data from an original time series file.  Since particular file doesn't matter, just open the first one in the variable list
         first_fn = var_list[0]
         if ('__meta' in first_fn):
-             first_fn = key 
+            first_fn = key
         if ('preproc' in ave_descr):
             vn_split = first_fn.split('_')
             if ('ext' in vn_split[0] or 'ai' in vn_split[0]):
@@ -427,12 +424,12 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         hist_string = time.strftime("%c")+': pyAverager ' + ':'.join(ave_descr) + ' ' + prefix +'* ' + outfile
         if os.path.isfile(new_file_name):
             if (clobber):
-                print 'Removing older version of:',new_file_name
+                print(('Removing older version of:'+new_file_name))
                 os.remove(new_file_name)
             else:
-                print 'ERROR: ',new_file_name,' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
+                print(('ERROR: '+new_file_name+' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'))
                 sys.exit(40)
-        years = ave_date 
+        years = ave_date
         new_file = create_ave_file(my_file[first_fn],new_file_name,hist_string,nc_formt,years,collapse_dim)
         # Remove extra dims from meta_list
         if collapse_dim is not None:
@@ -443,16 +440,16 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         # Add meta variables
         temp = {}
         for mv in meta_list:
-            if mv in my_file[first_fn].variables.keys():
+            if mv in list(my_file[first_fn].variables.keys()):
                 temp[mv] = create_meta_var(my_file[first_fn],mv,new_file,collapse_dim)
         all_files_vars = temp
 
-    # Have each rank open it's own variable file(s), retreive variable info, and send to root to create variable 
+    # Have each rank open it's own variable file(s), retreive variable info, and send to root to create variable
     if ((hist_type == 'slice' or ('__d' in ave_descr)) and (serial or not l_master) and len(lvar_list) > 0): # Open just once because all vars are located in one file
         f = open_file(lvar_list[0], hist_dict[yr][month],split_name)
     for orig_var_name in lvar_list:
         if ('__meta' in orig_var_name):
-            var_fn = key 
+            var_fn = key
         else:
             var_fn = orig_var_name
         if ('hor.meanConcat' in ave_descr or 'preproc' in ave_descr):
@@ -485,9 +482,9 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
             f = open_file(var_fn, hist_dict[yr][month],split_name)
         if ('__meta' in orig_var_name):
             parts = orig_var_name.split('__')
-            lookup_vn = parts[0] 
-            write_var = parts[0]        
- 
+            lookup_vn = parts[0]
+            write_var = parts[0]
+
         if(serial or not l_master):
             type_code,dimnames,attr = get_var_info(f,lookup_vn,ave_descr,collapse_dim)
             if (pre_proc_attr is not None and 'time' not in unit_var):
@@ -516,7 +513,7 @@ def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_
         all_files_vars.update(new_file.variables)
         # All vars are defined, Write all meta vars to the files
         for mv in meta_list:
-            if mv in my_file[first_fn].variables.keys():
+            if mv in list(my_file[first_fn].variables.keys()):
                 write_meta(all_files_vars, mv, my_file[first_fn])
     return all_files_vars,new_file
 
@@ -536,11 +533,11 @@ def write_meta(temp, var_name, my_file):
 
     @param var_name    The meta variable name.
 
-    @param my_file     A pointer to the input file from where to copy the meta variable from. 
+    @param my_file     A pointer to the input file from where to copy the meta variable from.
     '''
     in_meta = my_file.variables[var_name]
     out_meta = temp[var_name]
-    typeCode = in_meta.typecode()
+    typeCode = in_meta.datatype
     if in_meta.rank > 0:
         out_meta[:] = in_meta[:]
     else:
@@ -562,7 +559,7 @@ def write_averages(temp, averages, var_name, index=-99):
     @param index      Optional: Insert at a certain time index.
     '''
 
-    if (temp[var_name].typecode() == 'i'):
+    if (temp[var_name].dtype == 'i'):
         t = np.long
     else:
         t = np.float32
@@ -590,8 +587,8 @@ def write_averages(temp, averages, var_name, index=-99):
 def which_winter_year(hist_dict, month, year, start_year):
 
     '''
-    Function to figure out for a given winter month (December, January, or February), 
-    which year to grab the data from.  
+    Function to figure out for a given winter month (December, January, or February),
+    which year to grab the data from.
 
     @param hist_dict     A dictionary that holds file references for all years/months.
 
@@ -606,7 +603,7 @@ def which_winter_year(hist_dict, month, year, start_year):
     # Figure out if we need to use the previous dec or the next jan/feb
     # Check if this is a djf ave.  If so, find correct year to pull the slice from
 
-    # Start with the new_yr equal to the current indexed year 
+    # Start with the new_yr equal to the current indexed year
     new_yr = year
 
     if (month == 11): # Dec average (python indexing starts at 0)
@@ -625,6 +622,5 @@ def which_winter_year(hist_dict, month, year, start_year):
                 new_yr = year + 1
         else:
             new_yr = year + 1
-    #print month,": "," old year: ",year," new year: ",new_yr,(len(hist_dict[start_year-1]))   
+    #print month,": "," old year: ",year," new year: ",new_yr,(len(hist_dict[start_year-1]))
     return new_yr
-

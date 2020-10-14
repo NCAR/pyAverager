@@ -128,52 +128,52 @@ sh_mask = new((/time,lat,lon/),float,0)
 nrank = dimsizes(dimsizes(tlat))
 
 if (nrank .eq. 3) then
-   tlat2 = conform(Lab,tlat(0,:,:),(/1,2/))
-   tlon2 = conform(Lab,tlon(0,:,:),(/1,2/))
+    tlat2 = conform(Lab,tlat(0,:,:),(/1,2/))
+    tlon2 = conform(Lab,tlon(0,:,:),(/1,2/))
 else
-   tlat2 = conform(Lab,tlat,(/1,2/))
-   tlon2 = conform(Lab,tlon,(/1,2/))
+    tlat2 = conform(Lab,tlat,(/1,2/))
+    tlon2 = conform(Lab,tlon,(/1,2/))
 end if
 
-      np = dimsizes(tlat)
-      nlat = np(0)
-      nlon = np(1)
-      do i=0,nlat-1
-         zlat = ind(.not.ismissing(tlat(i,:)))
-         zlon = ind(.not.ismissing(tlon(i,:)))
-         j1 = min((/min(zlat),min(zlon)/))
-         j2 = max((/max(zlat),max(zlon)/))
-         delete(zlat)
-         delete(zlon)
-         do j=j1,j2
+    np = dimsizes(tlat)
+    nlat = np(0)
+    nlon = np(1)
+    do i=0,nlat-1
+        zlat = ind(.not.ismissing(tlat(i,:)))
+        zlon = ind(.not.ismissing(tlon(i,:)))
+        j1 = min((/min(zlat),min(zlon)/))
+        j2 = max((/max(zlat),max(zlon)/))
+        delete(zlat)
+        delete(zlon)
+        do j=j1,j2
             plat = tlat(i,j)
             plon = tlon(i,j)
             if .not.(ismissing(plat) .or. ismissing(plon)) then
             if ((plat.ge.min(Okhotsk_poly_lat)).and.(plon.ge.min(Okhotsk_poly_long))) then
-               Lab_inout = gc_inout(plat,plon,Lab_poly_lat,Lab_poly_long)
-               Bering_inout = gc_inout(plat,plon,Bering_poly_lat,Bering_poly_long)
-               Okhotsk_inout = gc_inout(plat,plon,Okhotsk_poly_lat,Okhotsk_poly_long)
-               Hudson_inout = gc_inout(plat,plon,Hudson_poly_lat,Hudson_poly_long)
-               CAArch_inout = gc_inout(plat,plon,CAArch_poly_lat,CAArch_poly_long)
-               if (Lab_inout .eq. True) then
-                   Lab_mask(:,i,j) = 1.
-               end if
-               if (Bering_inout .eq. True) then
-                  Bering_mask(:,i,j) = 1.
-               end if
-               if (Okhotsk_inout .eq. True) then
-                  Okhotsk_mask(:,i,j) = 1.
-               end if
-               if (Hudson_inout .eq. True) then
-                  Hudson_mask(:,i,j) = 1.
-               end if
-               if (CAArch_inout .eq. True) then
-                  CAArch_mask(:,i,j) = 1.
-               end if
+                Lab_inout = gc_inout(plat,plon,Lab_poly_lat,Lab_poly_long)
+                Bering_inout = gc_inout(plat,plon,Bering_poly_lat,Bering_poly_long)
+                Okhotsk_inout = gc_inout(plat,plon,Okhotsk_poly_lat,Okhotsk_poly_long)
+                Hudson_inout = gc_inout(plat,plon,Hudson_poly_lat,Hudson_poly_long)
+                CAArch_inout = gc_inout(plat,plon,CAArch_poly_lat,CAArch_poly_long)
+                if (Lab_inout .eq. True) then
+                    Lab_mask(:,i,j) = 1.
+                end if
+                if (Bering_inout .eq. True) then
+                    Bering_mask(:,i,j) = 1.
+                end if
+                if (Okhotsk_inout .eq. True) then
+                    Okhotsk_mask(:,i,j) = 1.
+                end if
+                if (Hudson_inout .eq. True) then
+                    Hudson_mask(:,i,j) = 1.
+                end if
+                if (CAArch_inout .eq. True) then
+                    CAArch_mask(:,i,j) = 1.
+                end if
             end if
             end if
-         end do
-      end do
+        end do
+    end do
 
 GIN_mask = where((tlat2.ge.GIN_lat(0) .and. tlat2.le.GIN_lat(1) .and.\
                   ((tlon2.ge.GIN_long1(0) .and. tlon2.le.GIN_long1(1)) .or.\
