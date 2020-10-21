@@ -47,5 +47,70 @@ def test_open_and_close_all(hist_dict, months_to_average, years, ave_type, fyr, 
     climFileIO.close_all_files(open_list) 
 
 
+def test_open_file_return_var():
+
+    var_val = climFileIO.open_file_return_var(test_filename, 'var01')
+    assert 800.0 == var_val.sum()
+
+
+@pytest.mark.parametrize('ave_type, result',[
+                                             ('ya', 'test_data.cice.h.0001.nc'),
+                                             ('tavg', 'tavg.0001.nc'),
+                                             ('mavg', 'mavg.0001.nc'),
+                                             ('hor.meanyr', 'atlantic_hor.meanyr.0001.nc'),
+                                             ('hor.meanConcat', 'atlantic_hor_mean_hor.meanConcat.test_data.cice.h_0001.nc')])
+def test_get_out_fn(ave_type, result):
+
+    prefix = 'test_data.cice.h'
+    date = '0001'
+    suffix = 'nc'
+
+    out_file_name = climFileIO.get_out_fn(ave_type, prefix, date, suffix, reg='atlantic')
+    assert result == out_file_name
+
+
+@pytest.mark.parametrize('ncformat',['netcdf4c', 'netcdf4c2', 'netcdf4', 'netcdf', 'netcdfLarge', 'foo'])
+def test_create_ave_file(ncformat):
+
+    my_file = test_file
+    outfile = 'tests/output/climFileIO/test_data.cice.h.0001.'+ncformat+'.nc'
+    hist_string = 'test suite call'
+    years = '0001'
+    ncfile = climFileIO.create_ave_file(my_file,outfile,hist_string,ncformat,years,collapse_dim='')
+    assert type(test_file) == type(ncfile)
+    ncfile.close()
+
+
+def test_define_ave_file():
+
+    l_master = True
+    serial = True
+    var_list = ['var01', 'var02', 'var03', 'var04', 'var05', 'var06', 'var07', 'var08', 'var09', 'var10', 'hi', 'aice']
+    lvar_list = ['var01', 'var02', 'var03', 'var04', 'var05', 'var06', 'var07', 'var08', 'var09', 'var10', 'hi', 'aice']
+    meta_list = ['lat', 'lon', 'lev']
+    hist_dict = slice_hist_dict
+    hist_type = 'slice'
+    ave_descr = ['ya','1']
+    prefix = 'test_data.cice.h'
+    outfile = 'test_data.cice.h.0001.nc'
+    split = False
+    split_name = ''
+    out_dir = 'tests/output/climFileIO/'
+    simplecomm = None
+    nc_formt = 'netcdf4'
+    month = 0
+    key = 'var02'
+    clobber = True
+    firstYr = 1
+    endYr = 1
+    ave_date = '0001'
+
+    all_files_vars,new_file = climFileIO.define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
+                        outfile,split,split_name,out_dir,simplecomm,nc_formt,month,key,clobber,firstYr,
+                        endYr,ave_date,pre_proc_attr=None, pre_proc_variables=None,collapse_dim='')
+    assert sorted(var_list + meta_list) == sorted(all_files_vars.keys())
+    assert type(test_file) == type(new_file)
+
+
 
 

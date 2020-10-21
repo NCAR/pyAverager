@@ -221,7 +221,7 @@ def create_ave_file(my_file,outfile,hist_string,ncformat,years,collapse_dim=''):
     if ('netcdf4c' in ncformat):
         Format = 'NETCDF4_CLASSIC'
         if (ncformat[-1].isdigit()):
-            self.compressionLevel = ncformat[-1]
+            compressionLevel = ncformat[-1]
     elif (ncformat == 'netcdf4'):
         Format = 'NETCDF4_CLASSIC'
     elif (ncformat == 'netcdf'):
@@ -272,8 +272,8 @@ def create_meta_var(my_file, var_name, new_file,collapse_dim=''):
         if dimn not in collapse_dim:
             dimnames.append(dimn)
     temp = new_file.createVariable(var_name,typeCode,tuple(dimnames))
-    for ka,va in list(var_hndl.ncattrs().items()):
-        temp.setncattr(ka,va)
+    for attr in var_hndl.ncattrs():
+        temp.setncattr(attr, getattr(var_hndl, attr))
 
     return temp
 
@@ -296,9 +296,6 @@ def create_var(var_name, typeCode, dimnames, attr, new_file):
     @return temp     A variable pointer.
     '''
     temp = new_file.createVariable(var_name,typeCode,tuple(dimnames))
-    for ka,va in list(attr.items()):
-        if ka != 'scale_factor':
-            temp.setncattr(ka,va)
 
     return temp
 
@@ -324,13 +321,13 @@ def get_var_info(my_file, var_name, ave_descr, collapse_dim=''):
     typeCode = var_hndl.datatype
 
     dimnames = []
-    for name,dim in var_hndl.dimensions.items():
+    for dim in var_hndl.dimensions:
         if('preproc' in ave_descr):
             if (dim.isunlimited()):
-                dimnames.append(name)
+                dimnames.append(dim)
         else:
-            if name not in collapse_dim:
-                dimnames.append(name)
+            if dim not in collapse_dim:
+                dimnames.append(dim)
     return typeCode,dimnames,var_hndl.ncattrs()
 
 def define_ave_file(l_master,serial,var_list,lvar_list,meta_list,hist_dict,hist_type,ave_descr,prefix,
@@ -538,7 +535,7 @@ def write_meta(temp, var_name, my_file):
     in_meta = my_file.variables[var_name]
     out_meta = temp[var_name]
     typeCode = in_meta.datatype
-    if in_meta.rank > 0:
+    if len(in_meta) > 0:
         out_meta[:] = in_meta[:]
     else:
         out_meta.assign_value(in_meta.get_value())

@@ -51,20 +51,21 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim,
 
     # Define global attributes
     attr = f1.ncattrs()
-    for n,v in list(attr.items()):
-        setattr(new_file,n,v)
+    for a in attr:
+        new_file.setncattr(a, getattr(f1, a))
 
     # Define dimensions
     dims = f1.dimensions
-    for var_d,l in list(dims.items()):
+    for var_d in dims:
+        l = len(f1.dimensions[var_d])
         if var_d == "time":
-            new_file.create_dimension(var_d, None)
+            new_file.createDimension(var_d, None)
         elif var_d == dim1:
-            new_file.create_dimension(var_d,dimlen1)
+            new_file.createDimension(var_d,dimlen1)
         elif var_d == dim2:
-            new_file.create_dimension(var_d,dimlen2)
+            new_file.createDimension(var_d,dimlen2)
         else:
-            new_file.create_dimension(var_d,l)
+            new_file.createDimension(var_d,l)
 
     # Define variable lists
     meta_list = []
@@ -87,7 +88,7 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim,
         dimnames = []
         for dimn in var_hndl.dimensions:
             dimnames.append(dimn)
-        temp[vn] = climFileIO.create_var(vn, var_hndl.dtype, dimnames, var_hndl.attributes, new_file)
+        temp[vn] = climFileIO.create_var(vn, var_hndl.dtype, dimnames, var_hndl.ncattrs(), new_file)
     #All vars are defined, Write all meta vars to the file
     for mv in meta_list:
         local_write_time = climFileIO.write_meta(all_files_vars, mv, f1)
@@ -121,15 +122,17 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2,  split_dim,
                 split_axis = i
         missing_vals = np.empty((fill_shape))
         missing_vals.fill(1.e30)
-
+ 
         combined_val = np.concatenate((var_val_2,missing_vals), axis=split_axis)
         combined_val = np.concatenate((combined_val,var_val_1), axis=split_axis)
 
         # Write to the file
         if (unlimited in var_hndl_1.dimensions):
+            print(temp[vn][0].shape)
+            print(combined_val.shape)
             temp[vn][0] = combined_val[:].astype(np.float32)
         else:
             out_meta = temp[vn]
-            out_meta.assign_value(combined_val.astype(np.float32))
+            out_meta = (combined_val.astype(np.float32))
 
     new_file.close()
