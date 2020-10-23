@@ -177,7 +177,7 @@ class PyAverager(object):
 
                     # split mpi comm world
                     temp_color = (rank // min_procs_per_ave) % num_of_avg
-                    num_of_groups = size/min_procs_per_ave
+                    num_of_groups = int(size/min_procs_per_ave)
                     if (temp_color == num_of_groups):
                         temp_color = temp_color - 1
                     groups = []
@@ -286,11 +286,11 @@ class PyAverager(object):
                         # Create and define the average file
                         timer.start("Create/Define Netcdf File")
                         if (len(ave_descr)<3 or 'hor.meanyr' in ave_descr):
-                            ave_date = string.zfill(ave_descr[1],4)
+                            ave_date = ave_descr[1].zfill(4)
                             ave_date2 = str(ave_descr[1])
                         else:
-                            date1 = string.zfill(ave_descr[1],4)
-                            date2 = string.zfill(ave_descr[2],4)
+                            date1 = ave_descr[1].zfill(4)
+                            date2 = ave_descr[2].zfill(4)
                             ave_date = date1+'-'+date2
                             ave_date2 = str(ave_descr[1])+'-'+str(ave_descr[2])
                         outfile_name = climFileIO.get_out_fn(ave_descr[0],prefix,ave_date,ave_t.average_types[ave_descr[0]]['fn'],region_name)

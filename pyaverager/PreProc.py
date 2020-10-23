@@ -194,8 +194,10 @@ class PreProc(object):
                         else:
                             # Get month slice
                             var_slice = rover.fetch_slice(hist_dict, year, m, get_var_name, file_dict)
-                            lat,lon = var_slice.shape
-                            full_lat,full_lon = o_lat.shape
+                            lat = var_slice.shape[-2]
+                            lon = var_slice.shape[-1]
+                            full_lat = o_lat.shape[-2]
+                            full_lon = o_lat.shape[-1]
                             if spec.split:
                                 fill = full_lat-lat
                                 missing_vals = np.zeros((fill,lon))

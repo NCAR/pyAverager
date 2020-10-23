@@ -97,8 +97,8 @@ def test_mean_diff_rms(var, hist_dict, months_to_average, years, ave_type, ave_i
 
     depend = False
     split = False
-    obs_file = '/Users/mickelso/Desktop/pyaverager/tests/data/timeseries_obs/obs.nc'
-    reg_obs_file = '/Users/mickelso/Desktop/pyaverager/tests/data/timeseries_obs/ocean_hor_mean_obs.nc'
+    obs_file = 'tests/data/timeseries_obs/obs.nc'
+    reg_obs_file = 'tests/data/timeseries_obs/ocean_hor_mean_obs.nc'
     file_dict, open_list = climFileIO.open_all_files(hist_dict,months_to_average,years,var,split,ave_type,depend,fyr)
 
     calc1, calc2, calc3 = climAverager.mean_diff_rms(var,'ocean',1,'REGION_MASK','TAREA',years,hist_dict,ave_info,file_dict,obs_file,reg_obs_file,None,True,9999,9999,4)

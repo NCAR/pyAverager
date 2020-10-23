@@ -323,7 +323,7 @@ def get_var_info(my_file, var_name, ave_descr, collapse_dim=''):
     dimnames = []
     for dim in var_hndl.dimensions:
         if('preproc' in ave_descr):
-            if (dim.isunlimited()):
+            if ('time' in dim):
                 dimnames.append(dim)
         else:
             if dim not in collapse_dim:
