@@ -1,7 +1,7 @@
 import time
 import numpy as np
-import rover
-import climFileIO
+from . import rover
+from . import climFileIO
 from numpy import ma as MA
 
 def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
@@ -13,12 +13,12 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
 
     @param years       A list of the years that are in this average
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -26,17 +26,17 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
 
     @param timer       The timer class used for time bookkeeping.
 
-    @param depend      Boolean variable to indicate if this average will be computed from previously calculated files. 
- 
+    @param depend      Boolean variable to indicate if this average will be computed from previously calculated files.
+
     @param fyr         The first year of average series
 
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
-    print('Computing ',ave_info['type'],' for ',var," for ",years)
+    print(('Computing ',ave_info['type'],' for ',var," for ",years))
 
     timer.start("Time to compute Average")
 
-    # Get a sample month/file to look into to see if the variable contains missing values 
+    # Get a sample month/file to look into to see if the variable contains missing values
     #sample_month = next(iter(file_dict.values()).next().itervalues())
     sample_month = file_dict[years[0]][ave_info['months_to_average'][0]]
 
@@ -52,8 +52,8 @@ def avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depend,fyr):
         for yr in years:
             for m in ave_info['months_to_average']:
             # Check if doing a winter average and get the correct year to pull
-                if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan' 
-		    or ave_type == 'next_feb' or ave_type == 'prev_dec'):
+                if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
+                    or ave_type == 'next_feb' or ave_type == 'prev_dec'):
                     pull_year = climFileIO.which_winter_year(hist_dict, m, yr,fyr)
                 else:
                     pull_year = yr
@@ -82,12 +82,12 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
 
     @param years       A list of the years that are in this average
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -132,7 +132,7 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
             else:
                 if (MA.any(MA.getmask(var_val))):
                     mask_sum = mask_sum + (MA.getmask(var_val)).astype(int)
-            # Add the variable value accumulator using the filled, zeroed about values. 
+            # Add the variable value accumulator using the filled, zeroed about values.
             if (first):
                 var_sum = var_filled
                 first = False
@@ -147,12 +147,12 @@ def avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,ti
     # Divide by mask to get average
     np.seterr(divide='ignore', invalid='ignore')
     var_Ave = var_sum / inv
-    # Replace any nan values with the fill value.  Nans will occur if there is a 
+    # Replace any nan values with the fill value.  Nans will occur if there is a
     # missing value for that array element in all slices that are averaged (ie. land in ocean files).
     if var_Ave.shape:
         var_Ave[np.isnan(var_Ave)]=fillValue
     else:
-        print var,var_Ave
+        print(var,var_Ave)
 
     return var_Ave
 
@@ -165,12 +165,12 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
 
     @param years       A list of the years that are in this average
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -184,7 +184,7 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
 
     @return var_Ave    The averaged results for this variable across the designated time frame.
     '''
-    print('Computing weighted ',ave_info['type'],' for ',var," for ",years)
+    print(('Computing weighted ',ave_info['type'],' for ',var," for ",years))
 
     timer.start("Time to compute Average")
 
@@ -192,7 +192,9 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
     first = True
 
     # Create the sum of all slices
-    sample_month = next(iter(file_dict.values()).next().itervalues())
+    #sample_month = next(iter(file_dict.values()).next().itervalues())
+    sample_month = file_dict[years[0]][ave_info['months_to_average'][0]]
+    #sample_month = next(iter(iter(list(file_dict.values())).next().values()))
     sample_fn = hist_dict[years[0]][0]['fn']
 
     # If the variable has missing values, we need to calculate the average differently
@@ -200,12 +202,12 @@ def weighted_avg_var(var,years,hist_dict,ave_info,file_dict,ave_type,timer,depen
         fillValue = getattr(sample_month['fp'].variables[var],'_FillValue')
         var_Ave = weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fillValue,timer,depend,fyr)
     else:
-        d_in_m = [31,28,31,30,31,30,31,31,30,31,30,31] 
+        d_in_m = [31,28,31,30,31,30,31,31,30,31,30,31]
         # Create the sum of all slices
         for yr in years:
             i = 0
             for m in ave_info['months_to_average']:
-                timer.start("Variable fetch time") 
+                timer.start("Variable fetch time")
                 # Check if doing a winter average and get the correct year to pull
                 if ((ave_type == 'djf' and depend == False) or ave_type == 'next_jan'
                     or ave_type == 'next_feb' or ave_type == 'prev_dec'):
@@ -246,12 +248,12 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
 
     @param years       A list of the years that are in this average
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -286,7 +288,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
                 pull_year = yr
             var_val = rover.fetch_slice(hist_dict,pull_year,m,var,file_dict)
             timer.stop("Variable fetch time")
-            
+
             if (hasattr(var_val, 'filled')):
                 var_filled = var_val.filled(fill_value=0) # zero out the masked grid points
             else:
@@ -307,7 +309,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
                 first = False
             else:
                 if (ave_type == 'ya'):
-                     var_sum = (var_val*d_in_m[m]) + var_sum
+                    var_sum = (var_val*d_in_m[m]) + var_sum
                 else:
                     var_sum = (var_val*ave_info['weights'][i]) + var_sum
             i+=1
@@ -319,7 +321,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
         var_Ave = np.divide(var_sum,count)
     # If any values are 0, then replace the var_Ave value with the fill value
     if (first_mask != True):
-        var_Ave[mask_sum>0]=fillValue 
+        var_Ave[mask_sum>0]=fillValue
 
     return var_Ave
 
@@ -327,7 +329,7 @@ def weighted_avg_var_missing(var,years,hist_dict,ave_info,file_dict,ave_type,fil
 def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,file_dict,nlev):
 
     '''
-    Computes the weighted hor mean rms diff for a year  
+    Computes the weighted hor mean rms diff for a year
 
     @param var         The name of the variable that is being  averaged.
 
@@ -339,16 +341,16 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
 
     @wgt_var           The name of the netCDF variable that contains the weight information.
 
-    @param year        The year to average over. 
+    @param year        The year to average over.
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param nlev        Number of ocean vertical levels
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -374,7 +376,7 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
             weights = np.vstack((weights,new_weights))
     else:
         region_mask = np.squeeze(region_mask,axis=0)
-        
+
     # Calculate the weighted average
     # First, we need to reshape the arrays to average along two dims
     if (reg_name == 'Glo'):
@@ -395,7 +397,7 @@ def weighted_hor_avg_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist
 def diff_var(var, avg_test_slice, obs_file):
 
     '''
-    Computes the diff for a year  
+    Computes the diff for a year
 
     @param var            The name of the variable that is being  averaged.
 
@@ -406,8 +408,8 @@ def diff_var(var, avg_test_slice, obs_file):
     @return var_Avg_diff  The difference for this variable.
     '''
 
-    # Open obs file and get variable slice 
-    obs_slice = climFileIO.open_file_return_var(obs_file,var) 
+    # Open obs file and get variable slice
+    obs_slice = climFileIO.open_file_return_var(obs_file,var)
 
     # Get the difference between the two variables
     var_Avg_diff = avg_test_slice - obs_slice
@@ -417,7 +419,7 @@ def diff_var(var, avg_test_slice, obs_file):
 def weighted_rms_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,file_dict,avg_test_slice,obs_file,nlev):
 
     '''
-    Computes the weighted rms for a year  
+    Computes the weighted rms for a year
 
     @param var            The name of the variable that is being  averaged.
 
@@ -429,19 +431,19 @@ def weighted_rms_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dic
 
     @wgt_var              The name of the netCDF variable that contains the weight information.
 
-    @param year           The year to average over. 
-    
-    @param hist_dict      A dictionary that holds file references for all years/months. 
-        
+    @param year           The year to average over.
+
+    @param hist_dict      A dictionary that holds file references for all years/months.
+
     @param ave_info       A dictionary of the type of average that is to be done.
                           Includes:  type, months_to_average, fn, and weights
                           (weights are not used in this function/average)
-    
+
     @param file_dict      A dictionary which holds file pointers to the input files that
                           are needed by this average calculation.
 
     @param avg_test_slice Averaged slice used in this calculation.
- 
+
     @param obs_file       Observation file that contains the values to be used in the caluculation.
 
     @param nlev           Number of ocean vertical levels
@@ -489,7 +491,7 @@ def weighted_rms_var_from_yr(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dic
 def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,file_dict,obs_file,reg_obs_file,simplecomm,serial,MPI_TAG,AVE_TAG,nlev):
 
     '''
-    Computes the weighted hor mean rms diff for a year  
+    Computes the weighted hor mean rms diff for a year
 
     @param var           The name of the variable that is being  averaged.
 
@@ -501,14 +503,14 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
 
     @wgt_var             The name of the netCDF variable that contains the weight information.
 
-    @param year          The year to average over. 
-    
-    @param hist_dict     A dictionary that holds file references for all years/months. 
-        
+    @param year          The year to average over.
+
+    @param hist_dict     A dictionary that holds file references for all years/months.
+
     @param ave_info      A dictionary of the type of average that is to be done.
                          Includes:  type, months_to_average, fn, and weights
                          (weights are not used in this function/average)
-    
+
     @param file_dict     A dictionary which holds file pointers to the input files that
                          are needed by this average calculation.
 
@@ -532,7 +534,7 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
 
     '''
 
-    print('Computing ',ave_info['type'],' for ',var," for ",year, " region ",reg_name)
+    print(('Computing ',ave_info['type'],' for ',var," for ",year, " region ",reg_name))
     var_diff = var+'_DIFF'
     var_rms = var+'_RMS'
 
@@ -550,8 +552,8 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
     if (not serial):
         #md_message = {'name':var_diff,'shape':var_DIFF.shape,'dtype':var_DIFF.dtype,'average':var_DIFF}
         simplecomm.collect(data=var_diff,tag=MPI_TAG)
-        simplecomm.collect(data=var_DIFF, tag=AVE_TAG)                                      
-   
+        simplecomm.collect(data=var_DIFF, tag=AVE_TAG)
+
     ## Get the RMS from the obs diff
     var_slice = rover.fetch_slice(hist_dict,year[0],0,var,file_dict)
     temp_diff = diff_var(var, var_slice, obs_file)
@@ -561,7 +563,7 @@ def mean_diff_rms(var,reg_name,reg_num,mask_var,wgt_var,year,hist_dict,ave_info,
         #md_message = {'name':var_rms,'shape':var_RMS.shape,'dtype':var_RMS.dtype,'average':var_RMS}
         simplecomm.collect(data=var_rms,tag=MPI_TAG)
         simplecomm.collect(data=var_RMS,  tag=AVE_TAG)
-    return var_Avg,var_DIFF,var_RMS 
+    return var_Avg,var_DIFF,var_RMS
 
 def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
 
@@ -579,12 +581,12 @@ def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
     @param file_dict       A dictionary which holds file pointers to the input files that
                            are needed by this average calculation.
 
-    @param collapse_dim    Used to collapse/average over one dim. 
+    @param collapse_dim    Used to collapse/average over one dim.
 
     '''
 
     # Get existing dimensions
-    orig_dims = file_dict[yr][month]['fp'].variables[var].dimensions 
+    orig_dims = file_dict[yr][month]['fp'].variables[var].dimensions
 
     # Creat a string to retreive the correct data slice
     slice_string = ''
@@ -592,7 +594,7 @@ def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
 
     if '<' not in collapse_dim:
         for d in orig_dims:
-            if d != collapse_dim:        
+            if d != collapse_dim:
                 if 'time' in d:
                     i = hist_dict[yr][month]['index']
                 else:
@@ -601,11 +603,11 @@ def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
             else:
                 slice_string = slice_string+d+'|:'
                 col_i = orig_dims.index(d)-1
-            
+
         # Get data slice
         timer.start("Variable fetch time")
         var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
-        timer.stop("Variable fetch time") 
+        timer.stop("Variable fetch time")
         if col_i != -999:
             return np.mean(var_val, axis=col_i, dtype=np.float64)
         else:
@@ -615,19 +617,19 @@ def zonal_average(var,yr,month,hist_dict,file_dict,timer,collapse_dim):
         spec_dims = {}
         for d in dims:
             bounds = d.split('<')
-            spec_dims[bounds[1]] = {'lower':bounds[0], 'upper':bounds[2]} 
+            spec_dims[bounds[1]] = {'lower':bounds[0], 'upper':bounds[2]}
         for d in orig_dims:
-            if d != collapse_dim:    
+            if d != collapse_dim:
                 if 'time' in d:
                     i = str(hist_dict[yr][month]['index'])
-                elif d in spec_dims.keys():
+                elif d in list(spec_dims.keys()):
                     i = spec_dims[d]['lower']+':'+spec_dims[d]['upper']
                 else:
                     i = ':'
             slice_string = slice_string+d+' '+str(i)
         timer.start("Variable fetch time")
         var_val = rover.fetch_slice(hist_dict,yr,month,var,file_dict,ext_select=slice_string)
-        timer.stop("Variable fetch time") 
+        timer.stop("Variable fetch time")
         return np.mean(var_val, dtype=np.float64)
 
 def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_files_vars,serial,timer,collapse_dim=''):
@@ -639,12 +641,12 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
 
     @param years           A list of the years that are in this average
 
-    @param hist_dict       A dictionary that holds file references for all years/months. 
+    @param hist_dict       A dictionary that holds file references for all years/months.
 
     @param ave_info        A dictionary of the type of average that is to be done.
                            Includes:  type, months_to_average, fn, and weights
                            (weights are not used in this function/average)
-    
+
     @param file_dict       A dictionary which holds file pointers to the input files that
                            are needed by this average calculation.
 
@@ -661,7 +663,7 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
     '''
     import asaptools
     if (not simplecomm.is_manager() or serial):
-        print('Concatenating ',ave_info['type'],' for ',var)
+        print(('Concatenating ',ave_info['type'],' for ',var))
     time_index = 0
     CONCAT_TAG = 60
     CONCAT_VAL_TAG = 67
@@ -714,25 +716,25 @@ def time_concat(var,years,hist_dict,ave_info,file_dict,ave_type,simplecomm,all_f
                     if var_val.dtype == 'S1' or var_val.dtype == 'c':
                         var_val = var_val[0]
                 timer.start("Write Netcdf Averages")
-                climFileIO.write_averages(all_files_vars, var_val, var_n, index=ti) 
+                climFileIO.write_averages(all_files_vars, var_val, var_n, index=ti)
                 timer.stop("Write Netcdf Averages")
             time_index = time_index + 1
 
 def get_metaCharValue(var,years,hist_dict,ave_info,file_dict,timer):
 
     '''
-    Reads a char meta variable from an existing input file to get the value to insert into the new file. 
+    Reads a char meta variable from an existing input file to get the value to insert into the new file.
 
     @param var         The name of the variable that is being  averaged.
 
     @param years       A list of the years that are in this average
 
-    @param hist_dict   A dictionary that holds file references for all years/months. 
+    @param hist_dict   A dictionary that holds file references for all years/months.
 
     @param ave_info    A dictionary of the type of average that is to be done.
                        Includes:  type, months_to_average, fn, and weights
                        (weights are not used in this function/average)
-    
+
     @param file_dict   A dictionary which holds file pointers to the input files that
                        are needed by this average calculation.
 
@@ -742,4 +744,4 @@ def get_metaCharValue(var,years,hist_dict,ave_info,file_dict,timer):
     '''
 
     var_values = rover.fetch_slice(hist_dict,years[0],ave_info['months_to_average'][0],var,file_dict)
-    return var_values[0] 
+    return var_values[0]
