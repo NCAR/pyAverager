@@ -3,6 +3,15 @@
 set -e
 set -eo pipefail
 
+mkdir tests/output/Preproc
+mkdir tests/output/climAverager
+mkdir tests/output/climFileIO
+mkdir tests/output/PyAverager/ice/slice
+mkdir tests/output/PyAverager/ice/series
+mkdir tests/output/PyAverager/atm/series
+mkdir tests/output/PyAverager/atm/slice
+mkdir tests/output/PyAverager/lnd/series
+mkdir tests/output/PyAverager/lnd/slice
 
 coverage run -p -m pytest tests/
 coverage combine
