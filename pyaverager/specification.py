@@ -1,21 +1,20 @@
-
-
 #########################################################################################################
 #
 # Create specifier factory function
 #
 #########################################################################################################
 
+
 def create_specifier(**kwargs):
 
-    '''
+    """
     Factory function for Specifier class objects
 
     @param kwargs Optional agruments to be passed to the newly created Specifier constructor.
 
     @return An instantiation of the Specifier class
 
-    '''
+    """
 
     return pyAveragerSpecifier(**kwargs)
 
@@ -26,19 +25,19 @@ def create_specifier(**kwargs):
 #
 #########################################################################################################
 
+
 class Specifier(object):
-    '''
+    """
     This is the base class for the pyAverager input specification.
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Constructor
-        '''
+        """
 
         ## String specifier type
-        self.specifier_type = 'undetermined'
-
+        self.specifier_type = "undetermined"
 
 
 #########################################################################################################
@@ -47,45 +46,49 @@ class Specifier(object):
 #
 #########################################################################################################
 
+
 class pyAveragerSpecifier(Specifier):
-    '''
+    """
     This class is a container for the input data required by the pyAverager
 
-    '''
+    """
 
-    def __init__(self,in_directory,
-                 out_directory,
-                 prefix,
-                 suffix,
-                 file_pattern='null',
-                 date_pattern='null',
-                 m_id = ['-999'],
-                 hist_type='slice',
-                 avg_list=[],
-                 weighted=False,
-                 split=False,
-                 split_files='null',
-                 split_orig_size='null',
-                 ncformat='netcdf4c',
-                 varlist=[],
-                 serial=False,
-                 mean_diff_rms_obs_dir='null',
-                 region_nc_var='null',
-                 regions={},
-                 region_wgt_var='null',
-                 obs_file='null',
-                 reg_obs_file_suffix='null',
-                 obs_dir='null',
-                 main_comm=None,
-                 clobber=False,
-                 ice_obs_file='null',
-                 reg_file = 'null',
-                 ncl_location='null',
-                 year0=-99,
-                 year1=-99,
-                 collapse_dim='',
-                 vertical_levels=60):
-        '''
+    def __init__(
+        self,
+        in_directory,
+        out_directory,
+        prefix,
+        suffix,
+        file_pattern="null",
+        date_pattern="null",
+        m_id=["-999"],
+        hist_type="slice",
+        avg_list=[],
+        weighted=False,
+        split=False,
+        split_files="null",
+        split_orig_size="null",
+        ncformat="netcdf4c",
+        varlist=[],
+        serial=False,
+        mean_diff_rms_obs_dir="null",
+        region_nc_var="null",
+        regions={},
+        region_wgt_var="null",
+        obs_file="null",
+        reg_obs_file_suffix="null",
+        obs_dir="null",
+        main_comm=None,
+        clobber=False,
+        ice_obs_file="null",
+        reg_file="null",
+        ncl_location="null",
+        year0=-99,
+        year1=-99,
+        collapse_dim="",
+        vertical_levels=60,
+    ):
+        """
         Initializes the internal data with optional arguments
 
         @param in_directory     Where the input directory resides (needs full path).
@@ -156,7 +159,7 @@ class pyAveragerSpecifier(Specifier):
         @param collapse_dims    Used to collapse/average over one dim.
 
         @param vertical_levels  Number of ocean vertical levels
-        '''
+        """
 
         # Where the input is located
         self.in_directory = in_directory
@@ -219,14 +222,32 @@ class pyAveragerSpecifier(Specifier):
         self.obs_dir = obs_dir
 
         # File pattern used to piece together a full file name
-        if (file_pattern == 'null'):
-            if (hist_type == 'slice'):
-                self.file_pattern = ['$prefix','.','$date_pattern','.','$suffix']
-            if (hist_type == 'series'):
+        if file_pattern == "null":
+            if hist_type == "slice":
+                self.file_pattern = ["$prefix", ".", "$date_pattern", ".", "$suffix"]
+            if hist_type == "series":
                 if split:
-                    self.file_pattern = ['$prefix','.','$var','_','$hem','.','$date_pattern','.','$suffix']
+                    self.file_pattern = [
+                        "$prefix",
+                        ".",
+                        "$var",
+                        "_",
+                        "$hem",
+                        ".",
+                        "$date_pattern",
+                        ".",
+                        "$suffix",
+                    ]
                 else:
-                    self.file_pattern = ['$prefix','.','$var','.','$date_pattern','.','$suffix']
+                    self.file_pattern = [
+                        "$prefix",
+                        ".",
+                        "$var",
+                        ".",
+                        "$date_pattern",
+                        ".",
+                        "$suffix",
+                    ]
         else:
             self.file_pattern = file_pattern
 
@@ -238,10 +259,10 @@ class pyAveragerSpecifier(Specifier):
         # Get first and last years used in the averaging by parsing the avg_list
         dates = []
         for avg in avg_list:
-            avg_descr = avg.split(':')
+            avg_descr = avg.split(":")
             for yr in avg_descr[1:]:
                 dates.append(int(yr))
-        if (year0 == -99 and year1 == -99):
+        if year0 == -99 and year1 == -99:
             self.year0 = int(min(dates))
             self.year1 = int(max(dates))
         else:
@@ -249,8 +270,9 @@ class pyAveragerSpecifier(Specifier):
             self.year1 = int(year1)
 
         # Initialize a simple_comm object if one was not passed in by the user
-        if (main_comm is None):
+        if main_comm is None:
             from asaptools import simplecomm
+
             self.main_comm = simplecomm.create_comm(serial=serial)
         else:
             self.main_comm = main_comm
