@@ -1,5 +1,14 @@
 # __init__.py
 
-from . import PyAverager, average_types, climAverager, climFileIO, regionOpts, rover, specification, PreProc
+from . import (
+    PreProc,
+    PyAverager,
+    average_types,
+    climAverager,
+    climFileIO,
+    regionOpts,
+    rover,
+    specification,
+)
 
 __version__ = "0.9.16"
