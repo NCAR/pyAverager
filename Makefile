@@ -33,6 +33,9 @@ test:
 
 
 coverage:
-	pytest --cov-report=html --cov=./ tests/ --verbose
-	open htmlcov/index.html
+	coverage run -p -m pytest tests/
+	coverage combine
+	coverage xml
+	coverage report
+	coverage html
 
