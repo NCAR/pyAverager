@@ -9,5 +9,4 @@ setup(name='PyAverager',
       author_email='mickelso@ucar.edu',
       url='https://www2.cisl.ucar.edu/tdd/asap/parallel-python-tools-post-processing-climate-data',
       packages=['pyaverager'],
-      requires=['Nio', 'mpi4py']
-     )
+      requires=['Nio', 'mpi4py'])

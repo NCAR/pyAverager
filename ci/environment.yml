@@ -1,4 +1,4 @@
-name: pyreshaper
+name: pyaverager
 channels:
   - conda-forge
   - defaults

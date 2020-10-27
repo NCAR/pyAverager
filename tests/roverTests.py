@@ -5,41 +5,1059 @@ import pytest
 from pyaverager import rover
 
 series_directory = 'tests/data/series_files/atm/'
-series_file_pattern = ['$prefix','.','$var','.','$date_pattern','.','$suffix']
+series_file_pattern = ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix']
 series_date_pattern = 'yyyymm-yyyymm'
 series_suffix = '.nc'
 
 slice_directory = 'tests/data/slice_files/atm/'
-slice_file_pattern = ['$prefix','.','$date_pattern','$suffix'] 
+slice_file_pattern = ['$prefix', '.', '$date_pattern', '$suffix']
 slice_suffix = '.nc'
 
-prefix = 'test_data.cam.h0' 
+prefix = 'test_data.cam.h0'
 split = 'False'
 split_fn = ''
 
-series_hist_dict = {1: {0: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 1, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 2, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 3, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 4, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 5, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 6, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 7, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 8, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 9, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 10, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 11, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}}, 2: {0: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 12, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 13, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 14, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 15, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 16, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 17, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 18, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 19, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 20, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 21, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 22, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 23, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}}, 3: {0: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 24, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 25, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 26, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 27, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 28, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 29, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 30, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 31, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 32, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 33, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 34, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 35, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}}, 4: {0: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 36, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 37, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 38, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 39, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 40, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 41, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 42, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 43, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 44, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 45, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 46, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 47, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}}, 5: {0: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 48, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 49, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 50, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 51, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 52, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 53, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 54, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 55, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 56, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 57, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 58, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/series_files/atm/', 'fn': 'test_data.cam.h0', 'index': 59, 'date_stamp': '000101-000512', 'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'], 'suffix': '.nc'}}, 6: {}}
-series_series_list = ['var.07', 'var.10', 'var.04', 'var.08', 'var.05', 'var.09', 'time__meta', 'var.06', 'var.01', 'var.03', 'var.02']
+series_hist_dict = {
+    1: {
+        0: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 1,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 2,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 3,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 4,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 5,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 6,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 7,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 8,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 9,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 10,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 11,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    2: {
+        0: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 12,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 13,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 14,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 15,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 16,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 17,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 18,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 19,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 20,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 21,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 22,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 23,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    3: {
+        0: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 24,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 25,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 26,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 27,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 28,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 29,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 30,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 31,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 32,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 33,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 34,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 35,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    4: {
+        0: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 36,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 37,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 38,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 39,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 40,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 41,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 42,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 43,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 44,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 45,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 46,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 47,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    5: {
+        0: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 48,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 49,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 50,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 51,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 52,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 53,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 54,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 55,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 56,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 57,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 58,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/series_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 59,
+            'date_stamp': '000101-000512',
+            'pattern': ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    6: {},
+}
+series_series_list = [
+    'var.07',
+    'var.10',
+    'var.04',
+    'var.08',
+    'var.05',
+    'var.09',
+    'time__meta',
+    'var.06',
+    'var.01',
+    'var.03',
+    'var.02',
+]
 series_meta_list = ['lev', 'lat', 'lon']
 series_key = 'hi'
 
-slice_hist_dict = {1: {0: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-01', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-02', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-03', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-04', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-05', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-06', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-07', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-08', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-09', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-10', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-11', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0001-12', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}}, 2: {0: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-01', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-02', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-03', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-04', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-05', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-06', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-07', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-08', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-09', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-10', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-11', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0002-12', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}}, 3: {0: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-01', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-02', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-03', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-04', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-05', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-06', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-07', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-08', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-09', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-10', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-11', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0003-12', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}}, 4: {0: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-01', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-02', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-03', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-04', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-05', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-06', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-07', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-08', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-09', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-10', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-11', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0004-12', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}}, 5: {0: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-01', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 1: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-02', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-03', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-04', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-05', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-06', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-07', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-08', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-09', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-10', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-11', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}, 11: {'directory': 'tests/data/slice_files/atm/', 'fn': 'test_data.cam.h0', 'index': 0, 'date_stamp': '0005-12', 'pattern': ['$prefix', '.', '$date_pattern', '$suffix'], 'suffix': '.nc'}}, 6: {}}
-slice_series_list = ['time__meta', 'var.01', 'var.02', 'var.03', 'var.04', 'var.05', 'var.06', 'var.07', 'var.08', 'var.09', 'var.10'] 
+slice_hist_dict = {
+    1: {
+        0: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-01',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-02',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-03',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-04',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-05',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-06',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-07',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-08',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-09',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-10',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-11',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0001-12',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    2: {
+        0: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-01',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-02',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-03',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-04',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-05',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-06',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-07',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-08',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-09',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-10',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-11',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0002-12',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    3: {
+        0: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-01',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-02',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-03',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-04',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-05',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-06',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-07',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-08',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-09',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-10',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-11',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0003-12',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    4: {
+        0: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-01',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-02',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-03',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-04',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-05',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-06',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-07',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-08',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-09',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-10',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-11',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0004-12',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    5: {
+        0: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-01',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        1: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-02',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        2: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-03',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        3: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-04',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        4: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-05',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        5: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-06',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        6: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-07',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        7: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-08',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        8: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-09',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        9: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-10',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        10: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-11',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+        11: {
+            'directory': 'tests/data/slice_files/atm/',
+            'fn': 'test_data.cam.h0',
+            'index': 0,
+            'date_stamp': '0005-12',
+            'pattern': ['$prefix', '.', '$date_pattern', '$suffix'],
+            'suffix': '.nc',
+        },
+    },
+    6: {},
+}
+slice_series_list = [
+    'time__meta',
+    'var.01',
+    'var.02',
+    'var.03',
+    'var.04',
+    'var.05',
+    'var.06',
+    'var.07',
+    'var.08',
+    'var.09',
+    'var.10',
+]
 slice_meta_list = ['lev', 'lat', 'lon']
 slice_key = 'time__meta'
 
 
 @pytest.mark.parametrize(
-    'start_yr, end_yr, hist_keys', 
+    'start_yr, end_yr, hist_keys',
     [
-        (1, 5, [1, 2, 3, 4, 5, 6]), 
+        (1, 5, [1, 2, 3, 4, 5, 6]),
         (2, 5, [1, 2, 3, 4, 5, 6]),
         (1, 4, [1, 2, 3, 4, 5]),
-        (2, 4, [1, 2, 3, 4, 5])
-    ],)
+        (2, 4, [1, 2, 3, 4, 5]),
+    ],
+)
 def test_set_slices_and_vars_time_series(start_yr, end_yr, hist_keys):
 
     hist_dict, series_list, meta_list, key = rover.set_slices_and_vars_time_series(
-                         series_directory, series_file_pattern, series_date_pattern, prefix, series_suffix, start_yr, end_yr, split, split_fn)
+        series_directory,
+        series_file_pattern,
+        series_date_pattern,
+        prefix,
+        series_suffix,
+        start_yr,
+        end_yr,
+        split,
+        split_fn,
+    )
     if start_yr == 1 and end_yr == 5:
         assert series_hist_dict == hist_dict
     assert list(hist_dict.keys()) == hist_keys
@@ -54,12 +1072,14 @@ def test_set_slices_and_vars_time_series(start_yr, end_yr, hist_keys):
         (1, 5, [1, 2, 3, 4, 5, 6]),
         (2, 5, [1, 2, 3, 4, 5, 6]),
         (1, 4, [1, 2, 3, 4, 5]),
-        (2, 4, [1, 2, 3, 4, 5])
-    ],)
+        (2, 4, [1, 2, 3, 4, 5]),
+    ],
+)
 def test_set_slices_and_vars_time_slice(start_yr, end_yr, hist_keys):
 
     hist_dict, series_list, meta_list, key = rover.set_slices_and_vars_time_slice(
-                         slice_directory, slice_file_pattern, prefix, slice_suffix, start_yr, end_yr)
+        slice_directory, slice_file_pattern, prefix, slice_suffix, start_yr, end_yr
+    )
     if start_yr == 1 and end_yr == 5:
         assert slice_hist_dict == hist_dict
     assert list(hist_dict.keys()) == hist_keys
@@ -71,40 +1091,151 @@ def test_set_slices_and_vars_time_slice(start_yr, end_yr, hist_keys):
 @pytest.mark.parametrize(
     'start_yr, end_yr, result1, result2',
     [
-        (2, 4, 
-        {2: {2: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'mar', 'pattern': None, 'suffix': '.nc'}, 3: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'apr', 'pattern': None, 'suffix': '.nc'}, 4: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'may', 'pattern': None, 'suffix': '.nc'}, 5: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'jun', 'pattern': None, 'suffix': '.nc'}, 6: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'jul', 'pattern': None, 'suffix': '.nc'}, 7: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'aug', 'pattern': None, 'suffix': '.nc'}, 8: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'sep', 'pattern': None, 'suffix': '.nc'}, 9: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'oct', 'pattern': None, 'suffix': '.nc'}, 10: {'directory': 'tests/data/slice_files/atm/', 'fn': 'null', 'index': 0, 'date_stamp': 'nov', 'pattern': None, 'suffix': '.nc'}}},
-        {},
+        (
+            2,
+            4,
+            {
+                2: {
+                    2: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'mar',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    3: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'apr',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    4: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'may',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    5: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'jun',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    6: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'jul',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    7: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'aug',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    8: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'sep',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    9: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'oct',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                    10: {
+                        'directory': 'tests/data/slice_files/atm/',
+                        'fn': 'null',
+                        'index': 0,
+                        'date_stamp': 'nov',
+                        'pattern': None,
+                        'suffix': '.nc',
+                    },
+                }
+            },
+            {},
         ),
-    ],)
+    ],
+)
 def test_set_slices_and_vars_depend(start_yr, end_yr, result1, result2):
 
-    djf = {'months_to_average':[11, 0, 1], 'type':'season average, djf', 'fn':'_DJF_climo.nc',
-        'weights':[0.3444444537162781, 0.3444444537162781, 0.3111111223697662],
-        'depend':['dec', 'jan', 'feb'], 'depend_type': 'month'}
-    hor = {'months_to_average':[0], 'type':'hor mean year', 'fn':'nc',
-        'depend':['ya'], 'depend_type': 'year'}
+    djf = {
+        'months_to_average': [11, 0, 1],
+        'type': 'season average, djf',
+        'fn': '_DJF_climo.nc',
+        'weights': [0.3444444537162781, 0.3444444537162781, 0.3111111223697662],
+        'depend': ['dec', 'jan', 'feb'],
+        'depend_type': 'month',
+    }
+    hor = {
+        'months_to_average': [0],
+        'type': 'hor mean year',
+        'fn': 'nc',
+        'depend': ['ya'],
+        'depend_type': 'year',
+    }
 
     hist_dict = rover.set_slices_and_vars_depend(
-                         slice_directory, slice_file_pattern, prefix, start_yr, end_yr, djf, 'dep_djf', '')
+        slice_directory, slice_file_pattern, prefix, start_yr, end_yr, djf, 'dep_djf', ''
+    )
     assert result1 == hist_dict
 
     hist_dict = rover.set_slices_and_vars_depend(
-                         slice_directory, slice_file_pattern, prefix, start_yr, end_yr, hor, 'dep_hor.meanyr','arctic')
+        slice_directory,
+        slice_file_pattern,
+        prefix,
+        start_yr,
+        end_yr,
+        hor,
+        'dep_hor.meanyr',
+        'arctic',
+    )
     print(hist_dict)
     assert result2 == hist_dict
 
 
 def test_fn_split():
-    
-    local_prefix = 'test_data.cice.h' 
-    name_fp_nh = 'tests/data/series_files/'+local_prefix+'.ice_nh.000101-000512.nc'
-    name_fp_sh = 'tests/data/series_files/'+local_prefix+'.ice_sh.000101-000512.nc'
+
+    local_prefix = 'test_data.cice.h'
+    name_fp_nh = 'tests/data/series_files/' + local_prefix + '.ice_nh.000101-000512.nc'
+    name_fp_sh = 'tests/data/series_files/' + local_prefix + '.ice_sh.000101-000512.nc'
     suffix = '.nc'
     split_fn = 'nh,sh'
     date_pattern = series_date_pattern
-    file_pattern = ['$prefix','.','$var','_','$hem','.','$date_pattern','.','$suffix']
+    file_pattern = ['$prefix', '.', '$var', '_', '$hem', '.', '$date_pattern', '.', '$suffix']
 
-    assert rover.fn_split(name_fp_nh, local_prefix, suffix, split_fn, date_pattern, file_pattern) == {'prefix': 'test_data.cice.h', 'var': 'ice', 'hem': 'nh', 'date_pattern': '000101-000512', 'suffix': '.nc'}
-    assert rover.fn_split(name_fp_sh, local_prefix, suffix, split_fn, date_pattern, file_pattern) == {'prefix': 'test_data.cice.h', 'var': 'ice', 'hem': 'sh', 'date_pattern': '000101-000512', 'suffix': '.nc'}
-
-
+    assert rover.fn_split(
+        name_fp_nh, local_prefix, suffix, split_fn, date_pattern, file_pattern
+    ) == {
+        'prefix': 'test_data.cice.h',
+        'var': 'ice',
+        'hem': 'nh',
+        'date_pattern': '000101-000512',
+        'suffix': '.nc',
+    }
+    assert rover.fn_split(
+        name_fp_sh, local_prefix, suffix, split_fn, date_pattern, file_pattern
+    ) == {
+        'prefix': 'test_data.cice.h',
+        'var': 'ice',
+        'hem': 'sh',
+        'date_pattern': '000101-000512',
+        'suffix': '.nc',
+    }
