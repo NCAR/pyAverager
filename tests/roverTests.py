@@ -524,7 +524,6 @@ series_series_list = [
     'var.02',
 ]
 series_meta_list = ['lev', 'lat', 'lon']
-series_key = 'hi'
 
 slice_hist_dict = {
     1: {
@@ -1033,7 +1032,6 @@ slice_series_list = [
     'var.10',
 ]
 slice_meta_list = ['lev', 'lat', 'lon']
-slice_key = 'time__meta'
 
 
 @pytest.mark.parametrize(
@@ -1063,7 +1061,6 @@ def test_set_slices_and_vars_time_series(start_yr, end_yr, hist_keys):
     assert list(hist_dict.keys()) == hist_keys
     assert series_series_list.sort() == series_list.sort()
     assert series_meta_list.sort() == meta_list.sort()
-    assert series_key == key
 
 
 @pytest.mark.parametrize(
@@ -1085,7 +1082,6 @@ def test_set_slices_and_vars_time_slice(start_yr, end_yr, hist_keys):
     assert list(hist_dict.keys()) == hist_keys
     assert slice_series_list.sort() == series_list.sort()
     assert slice_meta_list.sort() == meta_list.sort()
-    assert slice_key == key
 
 
 @pytest.mark.parametrize(

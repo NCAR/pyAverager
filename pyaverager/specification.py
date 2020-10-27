@@ -37,7 +37,7 @@ class Specifier(object):
         """
 
         ## String specifier type
-        self.specifier_type = "undetermined"
+        self.specifier_type = 'undetermined'
 
 
 #########################################################################################################
@@ -59,33 +59,33 @@ class pyAveragerSpecifier(Specifier):
         out_directory,
         prefix,
         suffix,
-        file_pattern="null",
-        date_pattern="null",
-        m_id=["-999"],
-        hist_type="slice",
+        file_pattern='null',
+        date_pattern='null',
+        m_id=['-999'],
+        hist_type='slice',
         avg_list=[],
         weighted=False,
         split=False,
-        split_files="null",
-        split_orig_size="null",
-        ncformat="netcdf4c",
+        split_files='null',
+        split_orig_size='null',
+        ncformat='netcdf4c',
         varlist=[],
         serial=False,
-        mean_diff_rms_obs_dir="null",
-        region_nc_var="null",
+        mean_diff_rms_obs_dir='null',
+        region_nc_var='null',
         regions={},
-        region_wgt_var="null",
-        obs_file="null",
-        reg_obs_file_suffix="null",
-        obs_dir="null",
+        region_wgt_var='null',
+        obs_file='null',
+        reg_obs_file_suffix='null',
+        obs_dir='null',
         main_comm=None,
         clobber=False,
-        ice_obs_file="null",
-        reg_file="null",
-        ncl_location="null",
+        ice_obs_file='null',
+        reg_file='null',
+        ncl_location='null',
         year0=-99,
         year1=-99,
-        collapse_dim="",
+        collapse_dim='',
         vertical_levels=60,
     ):
         """
@@ -222,31 +222,31 @@ class pyAveragerSpecifier(Specifier):
         self.obs_dir = obs_dir
 
         # File pattern used to piece together a full file name
-        if file_pattern == "null":
-            if hist_type == "slice":
-                self.file_pattern = ["$prefix", ".", "$date_pattern", ".", "$suffix"]
-            if hist_type == "series":
+        if file_pattern == 'null':
+            if hist_type == 'slice':
+                self.file_pattern = ['$prefix', '.', '$date_pattern', '.', '$suffix']
+            if hist_type == 'series':
                 if split:
                     self.file_pattern = [
-                        "$prefix",
-                        ".",
-                        "$var",
-                        "_",
-                        "$hem",
-                        ".",
-                        "$date_pattern",
-                        ".",
-                        "$suffix",
+                        '$prefix',
+                        '.',
+                        '$var',
+                        '_',
+                        '$hem',
+                        '.',
+                        '$date_pattern',
+                        '.',
+                        '$suffix',
                     ]
                 else:
                     self.file_pattern = [
-                        "$prefix",
-                        ".",
-                        "$var",
-                        ".",
-                        "$date_pattern",
-                        ".",
-                        "$suffix",
+                        '$prefix',
+                        '.',
+                        '$var',
+                        '.',
+                        '$date_pattern',
+                        '.',
+                        '$suffix',
                     ]
         else:
             self.file_pattern = file_pattern
@@ -259,7 +259,7 @@ class pyAveragerSpecifier(Specifier):
         # Get first and last years used in the averaging by parsing the avg_list
         dates = []
         for avg in avg_list:
-            avg_descr = avg.split(":")
+            avg_descr = avg.split(':')
             for yr in avg_descr[1:]:
                 dates.append(int(yr))
         if year0 == -99 and year1 == -99:

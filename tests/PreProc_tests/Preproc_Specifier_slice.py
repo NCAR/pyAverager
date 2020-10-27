@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
-from pyaverager import specification, PreProc
-
+from pyaverager import PreProc, specification
 
 average = [
     'ya:1',

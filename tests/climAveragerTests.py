@@ -1,11 +1,12 @@
 from __future__ import print_function
 
-import pytest
-import numpy as np
 import os
 
-from pyaverager import climAverager, climFileIO, average_types
-from asaptools import timekeeper
+import numpy as np
+import pytest
+from asaptools import simplecomm as sc, timekeeper
+
+from pyaverager import average_types, climAverager, climFileIO
 
 timer = timekeeper.TimeKeeper()
 
@@ -1930,9 +1931,6 @@ def test_zonal_average(
     )
 
     climFileIO.close_all_files(open_list)
-
-
-from asaptools import simplecomm as sc
 
 
 @pytest.mark.parametrize(

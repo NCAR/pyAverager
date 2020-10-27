@@ -1,7 +1,8 @@
 from __future__ import print_function
 
+from subprocess import PIPE, Popen
+
 import pytest
-from subprocess import Popen, PIPE
 
 
 @pytest.mark.parametrize('n', [4])

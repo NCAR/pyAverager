@@ -1,9 +1,9 @@
 from __future__ import print_function
 
+import netCDF4 as nc
 import pytest
 
 from pyaverager import climFileIO
-import netCDF4 as nc
 
 test_filename = 'tests/data/slice_files/ice/test_data.cice.h.0001-01.nc'
 test_file = nc.Dataset(test_filename, "r")

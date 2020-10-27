@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from pyaverager import PyAverager, specification
 import PreProc
+from pyaverager import PyAverager, specification
 
 #### User modify ####
 

@@ -2,9 +2,10 @@
 
 import os
 
+from pyaverager import PreProc, specification
+
 print(os.getcwd())
 
-from pyaverager import specification, PreProc
 
 average = [
     'ya:1',

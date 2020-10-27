@@ -3,7 +3,6 @@ from __future__ import print_function
 import pyaverager
 from pyaverager import specification
 
-
 average = [
     'ya:1',
     'ya:2',

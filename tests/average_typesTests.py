@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-
 import pyaverager.average_types as ave_t
 
 

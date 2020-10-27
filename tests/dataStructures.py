@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-
 series_directory = 'tests/data/series_files/atm/'
 series_file_pattern = ['$prefix', '.', '$var', '.', '$date_pattern', '.', '$suffix']
 series_date_pattern = 'yyyymm-yyyymm'
