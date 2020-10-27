@@ -36,8 +36,8 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2, split_dim, 
     temp = {}
 
     # Open the two partial files
-    f1 = nc.Dataset(fn1, "r")
-    f2 = nc.Dataset(fn2, "r")
+    f1 = nc.Dataset(fn1, 'r')
+    f2 = nc.Dataset(fn2, 'r')
 
     # Get the sizes of the partial dimensions
     size1 = f1.dimensions[split_dim]
@@ -45,18 +45,18 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2, split_dim, 
 
     if os.path.isfile(outfile):
         if clobber:
-            print(("Removing older version of:" + outfile))
+            print(('Removing older version of:' + outfile))
             os.remove(outfile)
         else:
             print(
                 (
-                    "ERROR: "
+                    'ERROR: '
                     + outfile
-                    + " exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting."
+                    + ' exists.  Please remove and continue.  Or pass clobber=True to PyAverager.  Exiting.'
                 )
             )
             sys.exit(40)
-    new_file = nc.Dataset(outfile, "w")
+    new_file = nc.Dataset(outfile, 'w')
 
     # Define global attributes
     attr = f1.ncattrs()
@@ -67,7 +67,7 @@ def combine_regions(fn1, fn2, outfile, dim1, dimlen1, dim2, dimlen2, split_dim, 
     dims = f1.dimensions
     for var_d in dims:
         ln = len(f1.dimensions[var_d])
-        if var_d == "time":
+        if var_d == 'time':
             new_file.createDimension(var_d, None)
         elif var_d == dim1:
             new_file.createDimension(var_d, dimlen1)

@@ -48,15 +48,12 @@ class PyAverager(object):
         @param spec          An instance of the Specification class which holds the user settings
                              that define which averages to compute, directories, file prefixes, etc
         """
-        import os
-        from . import rover
-        from . import climAverager
-        from . import climFileIO
-        from . import average_types as ave_t
-        from . import regionOpts
         import collections
-        from asaptools import timekeeper
-        from asaptools import partition
+        import os
+
+        from asaptools import partition, timekeeper
+
+        from . import average_types as ave_t, climAverager, climFileIO, regionOpts, rover
 
         # ==============================================================================
         #
@@ -65,14 +62,14 @@ class PyAverager(object):
         # ==============================================================================
         # Initialize the timekeeper class and start 'total' timer
         timer = timekeeper.TimeKeeper()
-        timer.start("Total Time")
+        timer.start('Total Time')
         # Initialize some timers that are not used by all tasks
-        timer.reset("Send Average Time")
-        timer.reset("Variable fetch time")
-        timer.reset("Recv Average Time")
-        timer.reset("Write Netcdf Averages")
-        timer.reset("Variable fetch time")
-        timer.reset("Time to compute Average")
+        timer.reset('Send Average Time')
+        timer.reset('Variable fetch time')
+        timer.reset('Recv Average Time')
+        timer.reset('Write Netcdf Averages')
+        timer.reset('Variable fetch time')
+        timer.reset('Time to compute Average')
 
         # Check average list to make sure it complies with the standards
         ave_t.average_compliance(spec.avg_list)
@@ -84,10 +81,10 @@ class PyAverager(object):
 
             file_pattern = list(spec.file_pattern)
 
-            if "-999" not in tag:
-                prefix = spec.prefix + "_" + tag
-                p_index = file_pattern.index("$prefix")
-                t_index = file_pattern.index("$m_id")
+            if '-999' not in tag:
+                prefix = spec.prefix + '_' + tag
+                p_index = file_pattern.index('$prefix')
+                t_index = file_pattern.index('$m_id')
 
                 for i in range(p_index + 1, t_index + 1):
                     del file_pattern[p_index + 1]
@@ -124,8 +121,8 @@ class PyAverager(object):
                 # ==============================================================================
 
                 ## Set var_list and file info dictionary
-                timer.start("Define history dictionary")
-                if spec.hist_type == "series":
+                timer.start('Define history dictionary')
+                if spec.hist_type == 'series':
                     (
                         full_hist_dict,
                         full_var_list,
@@ -156,14 +153,14 @@ class PyAverager(object):
                         spec.year0,
                         spec.year1,
                     )
-                timer.stop("Define history dictionary")
+                timer.stop('Define history dictionary')
 
                 # Set variable list.  If there was a variable list passed to the averager, use this list.  Other wise,
                 # use all variables within the file.
                 if len(spec.varlist) > 0:
                     var_list = spec.varlist
                     for v in full_var_list:
-                        if "__meta" in v:
+                        if '__meta' in v:
                             var_list.append(v)
                 else:
                     var_list = full_var_list
@@ -258,30 +255,30 @@ class PyAverager(object):
                 # Files are only split for the first loop.  When the depend averages start, they will operate on files
                 # that are already stiched together.
                 if i != 0:
-                    spec.split_name = "null"
+                    spec.split_name = 'null'
                     spec.split = False
-                    spec.split_files = "null"
+                    spec.split_files = 'null'
                 # Toggle to incate that extra variables were added to the local file list (only do once per average level
                 added_extra_vars = False
 
                 for ave in laverages:
-                    for split_name in spec.split_files.split(","):
+                    for split_name in spec.split_files.split(','):
                         # Split apart the average info to get type of average and year(s)
-                        ave_descr = ave.split(":")
-                        if "hor.meanyr" in ave_descr[0] or "hor.meanConcat" in ave_descr[0]:
-                            ave_name_split = ave_descr[0].split("_")
+                        ave_descr = ave.split(':')
+                        if 'hor.meanyr' in ave_descr[0] or 'hor.meanConcat' in ave_descr[0]:
+                            ave_name_split = ave_descr[0].split('_')
                             region_num = ave_name_split[len(ave_name_split) - 1]
                             region_name = spec.regions[int(region_num)]
                             # Remove the region number as part of the average name
                             ave_descr[0] = ave_name_split[0]
                         else:
-                            region_name = "null"
+                            region_name = 'null'
                             region_num = -99
 
                         # If the average depends on other averages that have to be computed, create a new temporary dictionary
-                        if "__d" in ave_descr:
+                        if '__d' in ave_descr:
                             yr0 = ave_descr[1]
-                            if len(ave_descr) > 2 and "_d" not in ave_descr[2]:
+                            if len(ave_descr) > 2 and '_d' not in ave_descr[2]:
                                 yr1 = ave_descr[2]
                             else:
                                 yr1 = ave_descr[1]
@@ -300,36 +297,36 @@ class PyAverager(object):
                             hist_dict = dict(full_hist_dict)
 
                         # If concat' mean_diff_rms files, for each var, also add the _DIFF and _RMS variables.
-                        if "hor.meanConcat" in ave_descr and added_extra_vars is False:
+                        if 'hor.meanConcat' in ave_descr and added_extra_vars is False:
                             new_vars = []
                             for v in lvar_list:
-                                if "__meta" not in v:
-                                    new_vars.append(v + "_DIFF")
-                                    new_vars.append(v + "_RMS")
+                                if '__meta' not in v:
+                                    new_vars.append(v + '_DIFF')
+                                    new_vars.append(v + '_RMS')
                             lvar_list = lvar_list + new_vars
                             added_extra_vars = True
 
                         # Create and define the average file
-                        timer.start("Create/Define Netcdf File")
-                        if len(ave_descr) < 3 or "hor.meanyr" in ave_descr:
+                        timer.start('Create/Define Netcdf File')
+                        if len(ave_descr) < 3 or 'hor.meanyr' in ave_descr:
                             ave_date = ave_descr[1].zfill(4)
                             ave_date2 = str(ave_descr[1])
                         else:
                             date1 = ave_descr[1].zfill(4)
                             date2 = ave_descr[2].zfill(4)
-                            ave_date = date1 + "-" + date2
-                            ave_date2 = str(ave_descr[1]) + "-" + str(ave_descr[2])
+                            ave_date = date1 + '-' + date2
+                            ave_date2 = str(ave_descr[1]) + '-' + str(ave_descr[2])
                         outfile_name = climFileIO.get_out_fn(
                             ave_descr[0],
                             prefix,
                             ave_date,
-                            ave_t.average_types[ave_descr[0]]["fn"],
+                            ave_t.average_types[ave_descr[0]]['fn'],
                             region_name,
                         )
-                        if "zonalavg" in ave_descr:
+                        if 'zonalavg' in ave_descr:
                             l_collapse_dim = spec.collapse_dim
                         else:
-                            l_collapse_dim = ""
+                            l_collapse_dim = ''
                         all_files_vars, new_file = climFileIO.define_ave_file(
                             l_master,
                             spec.serial,
@@ -346,7 +343,7 @@ class PyAverager(object):
                             spec.out_directory,
                             inter_comm,
                             spec.ncformat,
-                            ave_t.average_types[ave_descr[0]]["months_to_average"][0],
+                            ave_t.average_types[ave_descr[0]]['months_to_average'][0],
                             key,
                             spec.clobber,
                             spec.year0,
@@ -354,15 +351,15 @@ class PyAverager(object):
                             ave_date2,
                             collapse_dim=l_collapse_dim,
                         )
-                        timer.stop("Create/Define Netcdf File")
+                        timer.stop('Create/Define Netcdf File')
 
                         # Start loops to compute averages
                         # create a list of years that are needed for this average
                         years = []
-                        if "__d" in ave_descr:
+                        if '__d' in ave_descr:
                             if (
-                                ave_t.average_types[ave_descr[0]]["depend_type"] == "month"
-                                or "_d" in ave_descr[2]
+                                ave_t.average_types[ave_descr[0]]['depend_type'] == 'month'
+                                or '_d' in ave_descr[2]
                             ):
                                 years.append(int(ave_descr[1]))
                             else:
@@ -379,15 +376,15 @@ class PyAverager(object):
                         fyr = years[0]
                         if i + 1 in list(avg_dict.keys()):
                             for a in avg_dict[i + 1]:
-                                if (ave_descr[0] + "_sig") in a:
-                                    spl = a.split(":")
+                                if (ave_descr[0] + '_sig') in a:
+                                    spl = a.split(':')
                                     fyr = int(spl[1])
 
                         file_dict = []
                         open_list = []
                         # Open all of the files that this rank will need for this average (for time slice files)
                         if (
-                            (spec.hist_type == "slice" or "__d" in ave_descr)
+                            (spec.hist_type == 'slice' or '__d' in ave_descr)
                             and (spec.serial or not l_master)
                             and len(lvar_list) > 0
                         ):
@@ -395,21 +392,21 @@ class PyAverager(object):
                             open_list = []
                             file_dict, open_list = climFileIO.open_all_files(
                                 hist_dict,
-                                ave_t.average_types[ave_descr[0]]["months_to_average"],
+                                ave_t.average_types[ave_descr[0]]['months_to_average'],
                                 years,
                                 lvar_list[0],
-                                "null",
+                                'null',
                                 ave_descr[0],
                                 depend,
                                 fyr,
                             )
                         # If concat of file instead of average, piece file together here.  If not, enter averaging loop
                         if (
-                            "mavg" in ave_descr
-                            or "moc" in ave_descr
-                            or "annall" in ave_descr
-                            or "mons" in ave_descr
-                            or "_mean" in ave_descr[0]
+                            'mavg' in ave_descr
+                            or 'moc' in ave_descr
+                            or 'annall' in ave_descr
+                            or 'mons' in ave_descr
+                            or '_mean' in ave_descr[0]
                         ) and len(lvar_list) > 0:
                             file_dict = []
                             open_list = []
@@ -417,10 +414,10 @@ class PyAverager(object):
                                 # Open files
                                 file_dict, open_list = climFileIO.open_all_files(
                                     hist_dict,
-                                    ave_t.average_types[ave_descr[0]]["months_to_average"],
+                                    ave_t.average_types[ave_descr[0]]['months_to_average'],
                                     years,
                                     lvar_list[0],
-                                    "null",
+                                    'null',
                                     ave_descr[0],
                                     depend,
                                     fyr,
@@ -429,26 +426,26 @@ class PyAverager(object):
                         for orig_var in lvar_list:
                             # Some variable names were suffixed with a meta label indicaticating that the variable exists in all files,
                             # but there isn't a didicated ts file to open.  Pick the first variable off the list and get values from there
-                            if "__meta" in orig_var:
+                            if '__meta' in orig_var:
                                 var = key
                             else:
                                 var = orig_var
                             # Open all of the files that this rank will need for this average (for time series files)
-                            if (spec.hist_type == "series" and "__d" not in ave_descr) and (
+                            if (spec.hist_type == 'series' and '__d' not in ave_descr) and (
                                 spec.serial or not l_master
                             ):
                                 if (
-                                    "mavg" not in ave_descr
-                                    or "moc" not in ave_descr
-                                    or "annall" not in ave_descr
-                                    or "mons" not in ave_descr
-                                    or "_mean" not in ave_descr[0]
+                                    'mavg' not in ave_descr
+                                    or 'moc' not in ave_descr
+                                    or 'annall' not in ave_descr
+                                    or 'mons' not in ave_descr
+                                    or '_mean' not in ave_descr[0]
                                 ):
                                     file_dict = []
                                     open_list = []
                                     file_dict, open_list = climFileIO.open_all_files(
                                         hist_dict,
-                                        ave_t.average_types[ave_descr[0]]["months_to_average"],
+                                        ave_t.average_types[ave_descr[0]]['months_to_average'],
                                         years,
                                         var,
                                         split_name,
@@ -457,24 +454,24 @@ class PyAverager(object):
                                         fyr,
                                     )
                             # We now have open files to pull values from.  Now reset var name
-                            if "__meta" in orig_var:
-                                parts = orig_var.split("__")
+                            if '__meta' in orig_var:
+                                parts = orig_var.split('__')
                                 var = parts[0]
                             # If concat, all of the procs will participate in this call
                             if (
-                                "mavg" in ave_descr
-                                or "moc" in ave_descr
-                                or "mocm" in ave_descr
-                                or "hor.meanConcat" in ave_descr
-                                or "annall" in ave_descr
-                                or "mons" in ave_descr
-                                or "_mean" in ave_descr[0]
-                                or "zonalavg" in ave_descr
+                                'mavg' in ave_descr
+                                or 'moc' in ave_descr
+                                or 'mocm' in ave_descr
+                                or 'hor.meanConcat' in ave_descr
+                                or 'annall' in ave_descr
+                                or 'mons' in ave_descr
+                                or '_mean' in ave_descr[0]
+                                or 'zonalavg' in ave_descr
                             ):
-                                if "zonalavg" in ave_descr:
+                                if 'zonalavg' in ave_descr:
                                     l_collapse_dim = spec.collapse_dim
                                 else:
-                                    l_collapse_dim = ""
+                                    l_collapse_dim = ''
                                 # Concat
                                 var_avg_results = climAverager.time_concat(
                                     var,
@@ -493,11 +490,11 @@ class PyAverager(object):
                             else:
                                 if spec.serial or not l_master:
                                     # mean_diff_rsm file
-                                    if "hor.meanyr" in ave_descr and "__meta" not in orig_var:
-                                        obs_file = spec.obs_dir + "/" + spec.obs_file
+                                    if 'hor.meanyr' in ave_descr and '__meta' not in orig_var:
+                                        obs_file = spec.obs_dir + '/' + spec.obs_file
                                         reg_obs_file = (
                                             spec.obs_dir
-                                            + "/"
+                                            + '/'
                                             + region_name
                                             + spec.reg_obs_file_suffix
                                         )
@@ -525,7 +522,7 @@ class PyAverager(object):
                                             spec.vertical_levels,
                                         )
                                     else:
-                                        if "__metaChar" in orig_var:
+                                        if '__metaChar' in orig_var:
                                             # Handle special meta
                                             var_avg_results = climAverager.get_metaCharValue(
                                                 var,
@@ -539,7 +536,7 @@ class PyAverager(object):
                                             # Average
                                             if (
                                                 spec.weighted is True
-                                                and "weights" in ave_t.average_types[ave_descr[0]]
+                                                and 'weights' in ave_t.average_types[ave_descr[0]]
                                             ):
                                                 var_avg_results = climAverager.weighted_avg_var(
                                                     var,
@@ -567,27 +564,27 @@ class PyAverager(object):
 
                                         # Close all open files (for time series files)
                                         if (
-                                            spec.hist_type == "series" and "__d" not in ave_descr
+                                            spec.hist_type == 'series' and '__d' not in ave_descr
                                         ) and (spec.serial or not l_master):
                                             climFileIO.close_all_files(open_list)
 
                                         # Pass the average results to master rank for writing
                                         if not spec.serial:
-                                            timer.start("Send Average Time")
+                                            timer.start('Send Average Time')
                                             inter_comm.collect(data=var, tag=VNAME_TAG)
                                             inter_comm.collect(data=var_avg_results, tag=AVE_TAG)
-                                            timer.stop("Send Average Time")
+                                            timer.stop('Send Average Time')
 
                                 if spec.serial or l_master:
                                     # If ave_descr is hor.meanyr, there will be three variables to write for each variable.
                                     # Other wise, there will only be 1
-                                    if "hor.meanyr" in ave_descr and "__meta" not in orig_var:
+                                    if 'hor.meanyr' in ave_descr and '__meta' not in orig_var:
                                         var_cnt = 3
                                     else:
                                         var_cnt = 1
                                     for r in range(0, var_cnt):
                                         if not spec.serial:
-                                            timer.start("Recv Average Time")
+                                            timer.start('Recv Average Time')
                                             # r_rank,results = inter_comm.collect(tag=AVE_TAG)
                                             # r_var_avg_results = results['average']
                                             r_rank, var_name = inter_comm.collect(tag=VNAME_TAG)
@@ -596,42 +593,42 @@ class PyAverager(object):
                                                 r_var_avg_results,
                                             ) = inter_comm.collect(tag=AVE_TAG)
                                             # var_name = results['name']
-                                            timer.start("Recv Average Time")
+                                            timer.start('Recv Average Time')
                                         else:
                                             var_name = var
                                             r_var_avg_results = var_avg_results
 
-                                        timer.start("Write Netcdf Averages")
+                                        timer.start('Write Netcdf Averages')
                                         climFileIO.write_averages(
                                             all_files_vars, r_var_avg_results, var_name
                                         )
                                         if (
-                                            "hor.meanyr" in ave_descr and spec.serial
-                                        ) and "__meta" not in orig_var:
+                                            'hor.meanyr' in ave_descr and spec.serial
+                                        ) and '__meta' not in orig_var:
                                             climFileIO.write_averages(
                                                 all_files_vars,
                                                 var_DIFF_results,
-                                                var_name + "_DIFF",
+                                                var_name + '_DIFF',
                                             )
                                             climFileIO.write_averages(
                                                 all_files_vars,
                                                 var_RMS_results,
-                                                var_name + "_RMS",
+                                                var_name + '_RMS',
                                             )
-                                        timer.stop("Write Netcdf Averages")
+                                        timer.stop('Write Netcdf Averages')
 
                         # Close all open files (for time slice files)
                         if (
-                            "mavg" in ave_descr
-                            or "moc__d" == ave_descr[0]
-                            or "annall" in ave_descr
-                            or "mons" in ave_descr
-                            or "_mean" in ave_descr[0]
+                            'mavg' in ave_descr
+                            or 'moc__d' == ave_descr[0]
+                            or 'annall' in ave_descr
+                            or 'mons' in ave_descr
+                            or '_mean' in ave_descr[0]
                         ) and len(lvar_list) > 0:
                             if spec.serial or not l_master:
                                 climFileIO.close_all_files(open_list)
                         elif (
-                            (spec.hist_type == "slice" or "__d" in ave_descr)
+                            (spec.hist_type == 'slice' or '__d' in ave_descr)
                             and (spec.serial or not l_master)
                             and len(lvar_list) > 0
                         ):
@@ -646,13 +643,13 @@ class PyAverager(object):
 
                     # If needed, stitch spatially split files together.
                     if spec.serial or l_master:
-                        if len(spec.split_files.split(",")) > 1:
-                            fn1 = spec.out_directory + "/nh_" + outfile_name
-                            fn2 = spec.out_directory + "/sh_" + outfile_name
-                            out_fn = spec.out_directory + "/" + outfile_name
-                            dim_info = spec.split_orig_size.split(",")
-                            dim1 = dim_info[0].split("=")
-                            dim2 = dim_info[1].split("=")
+                        if len(spec.split_files.split(',')) > 1:
+                            fn1 = spec.out_directory + '/nh_' + outfile_name
+                            fn2 = spec.out_directory + '/sh_' + outfile_name
+                            out_fn = spec.out_directory + '/' + outfile_name
+                            dim_info = spec.split_orig_size.split(',')
+                            dim1 = dim_info[0].split('=')
+                            dim2 = dim_info[1].split('=')
                             regionOpts.combine_regions(
                                 fn1,
                                 fn2,
@@ -661,7 +658,7 @@ class PyAverager(object):
                                 int(dim1[1]),
                                 dim2[0],
                                 int(dim2[1]),
-                                "nj",
+                                'nj',
                                 spec.clobber,
                             )
 
@@ -677,11 +674,11 @@ class PyAverager(object):
         #
         # ==============================================================================
 
-        timer.stop("Total Time")
-        my_times = spec.main_comm.allreduce(timer.get_all_times(), "max")
+        timer.stop('Total Time')
+        my_times = spec.main_comm.allreduce(timer.get_all_times(), 'max')
 
         if g_master:
-            print("==============================================")
-            print("COMPLETED SUCCESSFULLY")
+            print('==============================================')
+            print('COMPLETED SUCCESSFULLY')
             print(my_times)
-            print("==============================================")
+            print('==============================================')

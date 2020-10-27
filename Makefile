@@ -25,11 +25,11 @@ clean-pyc:
 
 lint:
 	flake8 --exclude='pyaverager/__init__.py' pyaverager
-	black --check --line-length=100 -S --exclude='pyaverager/__init__.py' pyaverager 
+	black --check --line-length=100 -S --exclude='pyaverager/__init__.py' pyaverager
 	isort --recursive -w 100 --check-only pyaverager
 
 test:
-	ci/runtests.sh	
+	ci/runtests.sh
 
 
 coverage:
@@ -38,4 +38,3 @@ coverage:
 	coverage xml
 	coverage report
 	coverage html
-

@@ -32,18 +32,18 @@ def avg_var(var, years, hist_dict, ave_info, file_dict, ave_type, timer, depend,
 
     @return var_Ave    The averaged results for this variable across the designated time frame.
     """
-    print(("Computing ", ave_info["type"], " for ", var, " for ", years))
+    print(('Computing ', ave_info['type'], ' for ', var, ' for ', years))
 
-    timer.start("Time to compute Average")
+    timer.start('Time to compute Average')
 
     # Get a sample month/file to look into to see if the variable contains missing values
     # sample_month = next(iter(file_dict.values()).next().itervalues())
-    sample_month = file_dict[years[0]][ave_info["months_to_average"][0]]
+    sample_month = file_dict[years[0]][ave_info['months_to_average'][0]]
 
     # If the variable has missing values, we need to calculate the average
     # with a mask accumulator
-    if hasattr(sample_month["fp"].variables[var], "_FillValue"):
-        fillValue = getattr(sample_month["fp"].variables[var], "_FillValue")
+    if hasattr(sample_month['fp'].variables[var], '_FillValue'):
+        fillValue = getattr(sample_month['fp'].variables[var], '_FillValue')
         var_Ave = avg_var_missing(
             var,
             years,
@@ -61,20 +61,20 @@ def avg_var(var, years, hist_dict, ave_info, file_dict, ave_type, timer, depend,
         count = 0
         first = True
         for yr in years:
-            for m in ave_info["months_to_average"]:
+            for m in ave_info['months_to_average']:
                 # Check if doing a winter average and get the correct year to pull
                 if (
-                    (ave_type == "djf" and depend is False)
-                    or ave_type == "next_jan"
-                    or ave_type == "next_feb"
-                    or ave_type == "prev_dec"
+                    (ave_type == 'djf' and depend is False)
+                    or ave_type == 'next_jan'
+                    or ave_type == 'next_feb'
+                    or ave_type == 'prev_dec'
                 ):
                     pull_year = climFileIO.which_winter_year(hist_dict, m, yr, fyr)
                 else:
                     pull_year = yr
-                timer.start("Variable fetch time")
+                timer.start('Variable fetch time')
                 var_val = rover.fetch_slice(hist_dict, pull_year, m, var, file_dict)
-                timer.stop("Variable fetch time")
+                timer.stop('Variable fetch time')
                 # Add the variable value to the accumulator
                 if first:
                     var_sum = var_val
@@ -84,7 +84,7 @@ def avg_var(var, years, hist_dict, ave_info, file_dict, ave_type, timer, depend,
                 count += 1
         var_Ave = np.divide(var_sum, count)
 
-    timer.stop("Time to compute Average")
+    timer.stop('Time to compute Average')
 
     return var_Ave
 
@@ -127,21 +127,21 @@ def avg_var_missing(
 
     first_mask = True
     for yr in years:
-        for m in ave_info["months_to_average"]:
-            timer.start("Variable fetch time")
+        for m in ave_info['months_to_average']:
+            timer.start('Variable fetch time')
             # Check if doing a winter average and get the correct year to pull
             if (
-                (ave_type == "djf" and depend is False)
-                or ave_type == "next_jan"
-                or ave_type == "next_feb"
-                or ave_type == "prev_dec"
+                (ave_type == 'djf' and depend is False)
+                or ave_type == 'next_jan'
+                or ave_type == 'next_feb'
+                or ave_type == 'prev_dec'
             ):
                 pull_year = climFileIO.which_winter_year(hist_dict, m, yr, fyr)
             else:
                 pull_year = yr
             var_val = rover.fetch_slice(hist_dict, pull_year, m, var, file_dict)
-            timer.stop("Variable fetch time")
-            if hasattr(var_val, "filled"):
+            timer.stop('Variable fetch time')
+            if hasattr(var_val, 'filled'):
                 var_filled = var_val.filled(fill_value=0)  # zero out the masked grid points
             else:
                 var_filled = np.ones(var_val.shape)
@@ -166,7 +166,7 @@ def avg_var_missing(
     else:
         inv = count - mask_sum
     # Divide by mask to get average
-    np.seterr(divide="ignore", invalid="ignore")
+    np.seterr(divide='ignore', invalid='ignore')
     var_Ave = var_sum / inv
     # Replace any nan values with the fill value.  Nans will occur if there is a
     # missing value for that array element in all slices that are averaged (ie. land in ocean files).
@@ -206,19 +206,19 @@ def weighted_avg_var(var, years, hist_dict, ave_info, file_dict, ave_type, timer
 
     @return var_Ave    The averaged results for this variable across the designated time frame.
     """
-    print(("Computing weighted ", ave_info["type"], " for ", var, " for ", years))
+    print(('Computing weighted ', ave_info['type'], ' for ', var, ' for ', years))
 
-    timer.start("Time to compute Average")
+    timer.start('Time to compute Average')
 
     count = 0
     first = True
 
     # Create the sum of all slices
-    sample_month = file_dict[years[0]][ave_info["months_to_average"][0]]
+    sample_month = file_dict[years[0]][ave_info['months_to_average'][0]]
 
     # If the variable has missing values, we need to calculate the average differently
-    if hasattr(sample_month["fp"].variables[var], "_FillValue"):
-        fillValue = getattr(sample_month["fp"].variables[var], "_FillValue")
+    if hasattr(sample_month['fp'].variables[var], '_FillValue'):
+        fillValue = getattr(sample_month['fp'].variables[var], '_FillValue')
         var_Ave = weighted_avg_var_missing(
             var,
             years,
@@ -236,40 +236,40 @@ def weighted_avg_var(var, years, hist_dict, ave_info, file_dict, ave_type, timer
         # Create the sum of all slices
         for yr in years:
             i = 0
-            for m in ave_info["months_to_average"]:
-                timer.start("Variable fetch time")
+            for m in ave_info['months_to_average']:
+                timer.start('Variable fetch time')
                 # Check if doing a winter average and get the correct year to pull
                 if (
-                    (ave_type == "djf" and depend is False)
-                    or ave_type == "next_jan"
-                    or ave_type == "next_feb"
-                    or ave_type == "prev_dec"
+                    (ave_type == 'djf' and depend is False)
+                    or ave_type == 'next_jan'
+                    or ave_type == 'next_feb'
+                    or ave_type == 'prev_dec'
                 ):
                     pull_year = climFileIO.which_winter_year(hist_dict, m, yr, fyr)
                 else:
                     pull_year = yr
                 var_val = rover.fetch_slice(hist_dict, pull_year, m, var, file_dict)
-                timer.stop("Variable fetch time")
+                timer.stop('Variable fetch time')
                 if first:
-                    if ave_type == "ya":
+                    if ave_type == 'ya':
                         var_sum = var_val * d_in_m[m]
                     else:
-                        var_sum = var_val * ave_info["weights"][i]
+                        var_sum = var_val * ave_info['weights'][i]
                     first = False
                 else:
-                    if ave_type == "ya":
+                    if ave_type == 'ya':
                         var_sum = (var_val * d_in_m[m]) + var_sum
                     else:
-                        var_sum = (var_val * ave_info["weights"][i]) + var_sum
+                        var_sum = (var_val * ave_info['weights'][i]) + var_sum
                 i += 1
             count += 1
         # Since the weights are only for 1 year, divide by total number of years
-        if ave_type == "ya":
+        if ave_type == 'ya':
             var_Ave = var_sum * (1 / 365.0)
         else:
             var_Ave = np.divide(var_sum, count)
 
-    timer.stop("Time to compute Average")
+    timer.stop('Time to compute Average')
 
     return var_Ave
 
@@ -314,20 +314,20 @@ def weighted_avg_var_missing(
     d_in_m = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     for yr in years:
         i = 0
-        for m in ave_info["months_to_average"]:
-            timer.start("Variable fetch time")
+        for m in ave_info['months_to_average']:
+            timer.start('Variable fetch time')
             # Check if doing a winter average and get the correct year to pull
             if (
-                (ave_type == "djf" and depend is False)
-                or ave_type == "next_jan"
-                or ave_type == "next_feb"
-                or ave_type == "prev_dec"
+                (ave_type == 'djf' and depend is False)
+                or ave_type == 'next_jan'
+                or ave_type == 'next_feb'
+                or ave_type == 'prev_dec'
             ):
                 pull_year = climFileIO.which_winter_year(hist_dict, m, yr, fyr)
             else:
                 pull_year = yr
             var_val = rover.fetch_slice(hist_dict, pull_year, m, var, file_dict)
-            timer.stop("Variable fetch time")
+            timer.stop('Variable fetch time')
 
             if first_mask:
                 if MA.any(MA.getmask(var_val)):
@@ -337,20 +337,20 @@ def weighted_avg_var_missing(
                 if MA.any(MA.getmask(var_val)):
                     mask_sum = mask_sum + (MA.getmask(var_val)).astype(int)
             if first:
-                if ave_type == "ya":
+                if ave_type == 'ya':
                     var_sum = var_val * d_in_m[m]
                 else:
-                    var_sum = var_val * ave_info["weights"][i]
+                    var_sum = var_val * ave_info['weights'][i]
                 first = False
             else:
-                if ave_type == "ya":
+                if ave_type == 'ya':
                     var_sum = (var_val * d_in_m[m]) + var_sum
                 else:
-                    var_sum = (var_val * ave_info["weights"][i]) + var_sum
+                    var_sum = (var_val * ave_info['weights'][i]) + var_sum
             i += 1
         count += 1
     # Since the weights are only for 1 year, divide by total number of years
-    if ave_type == "ya":
+    if ave_type == 'ya':
         var_Ave = var_sum * (1 / 365.0)
     else:
         var_Ave = np.divide(var_sum, count)
@@ -425,7 +425,7 @@ def weighted_hor_avg_var_from_yr(
 
     # Calculate the weighted average
     # First, we need to reshape the arrays to average along two dims
-    if reg_name == "Glo":
+    if reg_name == 'Glo':
         temp_mask = MA.masked_where(region_mask <= int(reg_num), var_val)
     else:
         temp_mask = MA.masked_where(region_mask != int(reg_num), var_val)
@@ -529,7 +529,7 @@ def weighted_rms_var_from_yr(
 
     # Calculate the weighted average
     # First, we need to reshape the arrays to average along two dims
-    if reg_name == "Glo":
+    if reg_name == 'Glo':
         temp_mask = MA.masked_where(region_mask <= int(reg_num), avg_test_slice)
     else:
         temp_mask = MA.masked_where(region_mask != int(reg_num), avg_test_slice)
@@ -538,11 +538,11 @@ def weighted_rms_var_from_yr(
 
     weights_flattened = weights.reshape(weights.shape[0], -1)
 
-    warnings.filterwarnings("ignore")
+    warnings.filterwarnings('ignore')
     rms_Ave = MA.sqrt(
         MA.average((ma_to_average * ma_to_average), axis=1, weights=weights_flattened)
     )
-    warnings.filterwarnings("default")
+    warnings.filterwarnings('default')
 
     # nrms = rms_Ave/(MA.max(rms_Ave) - MA.min(rms_Ave))
     nrms = rms_Ave
@@ -615,18 +615,18 @@ def mean_diff_rms(
 
     print(
         (
-            "Computing ",
-            ave_info["type"],
-            " for ",
+            'Computing ',
+            ave_info['type'],
+            ' for ',
             var,
-            " for ",
+            ' for ',
             year,
-            " region ",
+            ' region ',
             reg_name,
         )
     )
-    var_diff = var + "_DIFF"
-    var_rms = var + "_RMS"
+    var_diff = var + '_DIFF'
+    var_rms = var + '_RMS'
 
     ## Get the masked regional average
     var_Avg = weighted_hor_avg_var_from_yr(
@@ -701,50 +701,50 @@ def zonal_average(var, yr, month, hist_dict, file_dict, timer, collapse_dim):
     """
 
     # Get existing dimensions
-    orig_dims = file_dict[yr][month]["fp"].variables[var].dimensions
+    orig_dims = file_dict[yr][month]['fp'].variables[var].dimensions
 
     # Creat a string to retreive the correct data slice
-    slice_string = ""
+    slice_string = ''
     col_i = -999
 
-    if "<" not in collapse_dim:
+    if '<' not in collapse_dim:
         for d in orig_dims:
             if d != collapse_dim:
-                if "time" in d:
-                    i = hist_dict[yr][month]["index"]
+                if 'time' in d:
+                    i = hist_dict[yr][month]['index']
                 else:
-                    i = ":"
-                slice_string = slice_string + d + "|" + str(i)
+                    i = ':'
+                slice_string = slice_string + d + '|' + str(i)
             else:
-                slice_string = slice_string + d + "|:"
+                slice_string = slice_string + d + '|:'
                 col_i = orig_dims.index(d) - 1
 
         # Get data slice
-        timer.start("Variable fetch time")
+        timer.start('Variable fetch time')
         var_val = rover.fetch_slice(hist_dict, yr, month, var, file_dict, ext_select=slice_string)
-        timer.stop("Variable fetch time")
+        timer.stop('Variable fetch time')
         if col_i != -999:
             return np.mean(var_val, axis=col_i, dtype=np.float64)
         else:
             return var_val
     else:
-        dims = collapse_dim.split(",")
+        dims = collapse_dim.split(',')
         spec_dims = {}
         for d in dims:
-            bounds = d.split("<")
-            spec_dims[bounds[1]] = {"lower": bounds[0], "upper": bounds[2]}
+            bounds = d.split('<')
+            spec_dims[bounds[1]] = {'lower': bounds[0], 'upper': bounds[2]}
         for d in orig_dims:
             if d != collapse_dim:
-                if "time" in d:
-                    i = str(hist_dict[yr][month]["index"])
+                if 'time' in d:
+                    i = str(hist_dict[yr][month]['index'])
                 elif d in list(spec_dims.keys()):
-                    i = spec_dims[d]["lower"] + ":" + spec_dims[d]["upper"]
+                    i = spec_dims[d]['lower'] + ':' + spec_dims[d]['upper']
                 else:
-                    i = ":"
-            slice_string = slice_string + d + " " + str(i)
-        timer.start("Variable fetch time")
+                    i = ':'
+            slice_string = slice_string + d + ' ' + str(i)
+        timer.start('Variable fetch time')
         var_val = rover.fetch_slice(hist_dict, yr, month, var, file_dict, ext_select=slice_string)
-        timer.stop("Variable fetch time")
+        timer.stop('Variable fetch time')
         return np.mean(var_val, dtype=np.float64)
 
 
@@ -759,7 +759,7 @@ def time_concat(
     all_files_vars,
     serial,
     timer,
-    collapse_dim="",
+    collapse_dim='',
 ):
 
     """
@@ -791,67 +791,67 @@ def time_concat(
     """
 
     if not simplecomm.is_manager() or serial:
-        print(("Concatenating ", ave_info["type"], " for ", var))
+        print(('Concatenating ', ave_info['type'], ' for ', var))
     time_index = 0
     CONCAT_TAG = 60
     CONCAT_VAL_TAG = 67
     # Loop over years, months, and variables to cat them all together into one file
     for yr in years:
-        for m in ave_info["months_to_average"]:
-            if "__meta" in var:
-                parts = var.split("__")
+        for m in ave_info['months_to_average']:
+            if '__meta' in var:
+                parts = var.split('__')
                 var = parts[0]
             # If slave, get slice and pass to master
             if not simplecomm.is_manager() or serial:
-                if "zonalavg" in ave_type:
+                if 'zonalavg' in ave_type:
                     if collapse_dim is not None:
-                        timer.start("Time to compute Average")
+                        timer.start('Time to compute Average')
                         var_val = zonal_average(
                             var, yr, m, hist_dict, file_dict, timer, collapse_dim
                         )
-                        timer.stop("Time to compute Average")
+                        timer.stop('Time to compute Average')
                 else:
-                    timer.start("Time to compute Average")
-                    timer.start("Variable fetch time")
+                    timer.start('Time to compute Average')
+                    timer.start('Variable fetch time')
                     var_val = rover.fetch_slice(hist_dict, yr, m, var, file_dict)
-                    timer.stop("Time to compute Average")
-                    timer.stop("Variable fetch time")
+                    timer.stop('Time to compute Average')
+                    timer.stop('Variable fetch time')
                 # print var, asaptools.__version__,type(var_val),var_val.dtype
                 # --------------------
                 if not serial:
-                    timer.start("Send Average Time")
+                    timer.start('Send Average Time')
                     var_shape = var_val.shape
                     var_dtype = var_val.dtype
                     md_message = {
-                        "name": var,
-                        "shape": var_shape,
-                        "dtype": var_dtype,
-                        "index": time_index,
+                        'name': var,
+                        'shape': var_shape,
+                        'dtype': var_dtype,
+                        'index': time_index,
                     }
                     simplecomm.collect(data=md_message, tag=CONCAT_TAG)
                     # var_val = np.ma.filled(var_val)
                     # print type(var_val), md_message
                     simplecomm.collect(data=var_val, tag=CONCAT_VAL_TAG)
-                    timer.stop("Send Average Time")
+                    timer.stop('Send Average Time')
             if simplecomm.is_manager() or serial:
                 # If master, recv slice and write to file
                 if not serial:
-                    timer.start("Recv Average Time")
+                    timer.start('Recv Average Time')
                     r_rank, results = simplecomm.collect(tag=CONCAT_TAG)
                     r_rank, var_val = simplecomm.collect(tag=CONCAT_VAL_TAG)
-                    if results["dtype"] == "S1" or results["dtype"] == "c":
+                    if results['dtype'] == 'S1' or results['dtype'] == 'c':
                         var_val = var_val[0]
-                    ti = results["index"]
-                    var_n = results["name"]
-                    timer.stop("Recv Average Time")
+                    ti = results['index']
+                    var_n = results['name']
+                    timer.stop('Recv Average Time')
                 else:
                     var_n = var
                     ti = time_index
-                    if var_val.dtype == "S1" or var_val.dtype == "c":
+                    if var_val.dtype == 'S1' or var_val.dtype == 'c':
                         var_val = var_val[0]
-                timer.start("Write Netcdf Averages")
+                timer.start('Write Netcdf Averages')
                 climFileIO.write_averages(all_files_vars, var_val, var_n, index=ti)
-                timer.stop("Write Netcdf Averages")
+                timer.stop('Write Netcdf Averages')
             time_index = time_index + 1
 
 
@@ -879,6 +879,6 @@ def get_metaCharValue(var, years, hist_dict, ave_info, file_dict, timer):
     """
 
     var_values = rover.fetch_slice(
-        hist_dict, years[0], ave_info["months_to_average"][0], var, file_dict
+        hist_dict, years[0], ave_info['months_to_average'][0], var, file_dict
     )
     return var_values[0]

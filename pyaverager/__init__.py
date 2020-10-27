@@ -1,3 +1,4 @@
+# flake8: noqa
 # __init__.py
 
 from . import (
@@ -11,4 +12,4 @@ from . import (
     specification,
 )
 
-__version__ = "0.9.16"
+__version__ = '0.9.16'

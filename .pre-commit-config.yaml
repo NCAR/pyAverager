@@ -1,4 +1,4 @@
-exclude: 'docs/'
+exclude: 'tests/'
 
 repos:
 
