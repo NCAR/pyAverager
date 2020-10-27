@@ -24,13 +24,13 @@ The PyAverager can create the climatology files needed by the AMWG, OMWG, Land, 
 
 ### Dependencies
 
-The PyAverager depends on the PyNIO, mpi4py, and PyTools packages to be installed on your system.  PyNIO is needed for NetCDF file I/O.  mpi4py and PyTools are needed for the parallel communication, though it is possible to run the PyAverager in serial mode without mpi4py.  
+The PyAverager depends on the PyNIO, mpi4py, and PyTools packages to be installed on your system.  PyNIO is needed for NetCDF file I/O.  mpi4py and PyTools are needed for the parallel communication, though it is possible to run the PyAverager in serial mode without mpi4py.
 
 If you are not running on a CESM supported machine, installation information can be found at:
 
 PyNIO: https://www.pyngl.ucar.edu/Download/
 
-Mpi4py: http://mpi4py.scipy.org/ 
+Mpi4py: http://mpi4py.scipy.org/
 (git clone https://bitbucket.org/mpi4py/mpi4py.git)
 
 PyTools: https://www2.cisl.ucar.edu/tdd/asap/parallel-python-tools-post-processing-climate-data
@@ -41,7 +41,7 @@ CESM Supported Machine Information (steps to take to get these packages into you
 NCAR:
 Add the following to the top of your bsub script or execute them on the command line and then type module save to always keep them in your environment:
 
-    module load python 
+    module load python
     module load all-python-libs
     module load asaptools
 
@@ -56,10 +56,10 @@ How To Install ASAP PyTools
 
 ### Building and Installing the PyAverager
 
-Check out the source code (2 options): 
+Check out the source code (2 options):
 
     git clone https://github.com/sherimickelson/pyAverager
-    pip install pyAverager --user 
+    pip install pyAverager --user
 
 
 If checking out the code via svn or git, you must install the pyAverager (the pip method will install the package for you).
@@ -77,8 +77,8 @@ You can also type python to get the interactive terminal and then type
 You will get an error if it is not in your path
 
 To install documentation, run:
-    
-    doxygen Doxyfile  
+
+    doxygen Doxyfile
 
 The documentation will be created in the apidocs directory.
 
@@ -94,7 +94,7 @@ Running the examples on NCAR:
     Select an example to run (control_*.py)
     Edit the control_*.py script you would like to run
     (See the Specifier section below for more details on editing the control script)
-    Run: 
+    Run:
     bsub < runAvg_mpi.csh
 
 
@@ -113,10 +113,10 @@ Series:  $CASE.$comp.$stream.$var.$year1$month1-$year2$month2.nc
 
 ### Types of Averages
 
-The table below lists the types of averages the PyAverager can compute. 
+The table below lists the types of averages the PyAverager can compute.
 
 |Average Option	| Description	                | Output Name	           | Can be Weighted?   | Can Be Created As a Dependency?|
-| :---        |:---        | :---        | :---        | :---        | 
+| :---        |:---        | :---        | :---        | :---        |
 | ya	        | Yearly Average	        | $CASE.$YEAR.nc	           | Yes 	        | No|
 | tavg	        | Ocn average across years	| tavg.$Year1-$Year2.nc	           | Yes	        | Yes|
 | annall	| Land model, annual averages, concat together| $CASE_ANN_ALL.nc   | Yes	        | Yes|
@@ -159,7 +159,7 @@ The averages that are listed in the above table as being able to create averages
 
 ### Specifier Arguements
 
-See examples/control.py for how to set all available options to send to the create_specifier function.  
+See examples/control.py for how to set all available options to send to the create_specifier function.
 
 #### Variables that must be passed to the specification.create_specifier class:
 
@@ -170,16 +170,16 @@ See examples/control.py for how to set all available options to send to the crea
     date_pattern: 'yyyymm-yyyymm'
     avg_list: a list of averages to compute   DEFAULT = Empty List
 
-Format:   ['ya:1850','mavg:1850:1890']  
+Format:   ['ya:1850','mavg:1850:1890']
 
-ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table. 
+ya is the only average to take one year.  All other averages expect a start year and end year separated by a colon.  The available average choices are listed in the above table.
 
 
 #### Variables that are mandatory for the Ice and Ocean Diags:
 
 The following variables are used by the Ocean Model Diags for the hor.meanConcat file creatation:
 
-    mean_diff_rms_obs_dir:  directory that contains the obervartion files needed to calculate the hor.mean.Concat file (Ocean Model).  
+    mean_diff_rms_obs_dir:  directory that contains the obervartion files needed to calculate the hor.mean.Concat file (Ocean Model).
     region_obs_file_suffix:  the suffix of region obs files found in the mean_diff_rms_obs_dir directory
     region_nc_var: variable name the contains the region mask information (Ocean Model)
     regions:  regions to create files for (ie[1:'Sou',2:'Pac']) region int that corresponds to the region_mask, region name.
@@ -190,10 +190,10 @@ The following variables are used by the Ocean Model Diags for the hor.meanConcat
 The following variables are used by the Ice Model Diags for the Pre_Proc file:
 
     ice_obs_file:  a netCDF file that contains area/weight information
-    ncl_location: the location of the ncl script used to create the reg_file (usually provided with this source code in pyaverager/ directory 
+    ncl_location: the location of the ncl script used to create the reg_file (usually provided with this source code in pyaverager/ directory
     reg_file:  the name of the netcdf file that contains the region mask information.  If it does not exist, it will be created for you.
 
-#### Optional variables that can be passed to the specification.create_specifier class:  
+#### Optional variables that can be passed to the specification.create_specifier class:
 
     ncformat: either 'netcdf4c' (netcdf4 compressed (lev=1)), 'netcdf4' (netcdf classic), and  'netcdf' (netcdf3 classic)  DEFAULT = 'netcdf4c'
     file_pattern: needed for non-cesm data
@@ -221,9 +221,9 @@ DEFAULT = False
 #### To generate the obs file needed for the Ocean hor.meandiff calculation:
 (or NCAR users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
 
-Required: 
- 
-From omwg obs_data: 
+Required:
+
+From omwg obs_data:
 
     PHC2_TEMP_gx1v6_ann_avg.nc and SALT PHC2_SALT_gx1v6_ann_avg.nc
     POP history file
@@ -253,15 +253,15 @@ Directions:
 
 (or NCAR users can copy/use files in /glade/p/work/mickelso/PyAvg-OMWG-obs/obs)
 
-Required: 
+Required:
 
-From omwg obs_data: 
-  
+From omwg obs_data:
+
     PHC2_TEMP_gx1v6_ann_avg.nc and SALT PHC2_SALT_gx1v6_ann_avg.nc
     POP history file
 
 Directions:
-    
+
     Copy PHC2_TEMP_gx1v6_ann_avg.nc to obs.nc
     ncks -A -v SALT PHC2_SALT_gx1v6_ann_avg.nc obs.nc
     ncks -A -v TAREA,REGION_MASK a_pop_history_file.nc obs.nc
@@ -273,13 +273,13 @@ Directions:
     ncatted -a _FillValue,TLAT,d,, obs.nc
     ncatted -a _FillValue,TLONG,d,, obs.nc
 
-For regions in the table below: 
+For regions in the table below:
 
     ncwa -m REGION_MASK -T eq -M <reg_number> -w TAREA -a nlon,nlat -v TEMP,SALT obs.nc <reg>_hor_mean_obs.nc
-   
+
 Region Table
-| Sou	| Pac	| Ind	| Atl	| Lab	| Gin	| Arc	| Hud | 
-:---        | :---        | :---        | :---        | :---        | :---        | :---        | :---        | 
+| Sou	| Pac	| Ind	| Atl	| Lab	| Gin	| Arc	| Hud |
+:---        | :---        | :---        | :---        | :---        | :---        | :---        | :---        |
 | 1	| 2	| 3	| 6	| 8	| 9	| 10	| 11  |
 
 For Glo:
@@ -300,4 +300,3 @@ For Glo:
     21:  Missing files to calculate DJF.  You need either the previous December or the January and February from last year+1
     22:  Time series files are split, but the dates between them are not contiguous (triggered in two different checks points)
     23:  A date was found within two different time series files.  Not sure which to use.
-

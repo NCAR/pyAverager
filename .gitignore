@@ -1,0 +1,15 @@
+*.nc
+*.s2s
+*.pyc
+__pycache__
+dist/
+build/
+/.settings/
+/.vscode/
+/.idea/
+.pytest_cache
+test-reports/
+.coverage*
+coverage.xml
+codecov.yml
+htmlcov/

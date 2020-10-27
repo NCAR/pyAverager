@@ -1,6 +1,15 @@
+# flake8: noqa
 # __init__.py
 
-import PyAverager, specification, PreProc
+from . import (
+    PreProc,
+    PyAverager,
+    average_types,
+    climAverager,
+    climFileIO,
+    regionOpts,
+    rover,
+    specification,
+)
 
-__version__ = "0.9.16"
-
+__version__ = '0.9.16'
