@@ -1092,7 +1092,7 @@ def test_create_ave_file(ncformat):
 
 def test_define_ave_file():
 
-    l_master = True
+    l_manager = True
     serial = True
     var_list = [
         'var01',
@@ -1141,7 +1141,7 @@ def test_define_ave_file():
     ave_date = '0001'
 
     all_files_vars, new_file = climFileIO.define_ave_file(
-        l_master,
+        l_manager,
         serial,
         var_list,
         lvar_list,

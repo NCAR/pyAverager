@@ -74,8 +74,8 @@ class PyAverager(object):
         # Check average list to make sure it complies with the standards
         ave_t.average_compliance(spec.avg_list)
 
-        # Check if I'm the global master
-        g_master = spec.main_comm.is_manager()
+        # Check if I'm the global manager
+        g_manager = spec.main_comm.is_manager()
 
         for tag in spec.m_id:
 
@@ -201,14 +201,14 @@ class PyAverager(object):
                     inter_comm, multi_comm = spec.main_comm.divide(group)
                     lsize = inter_comm.get_size()
 
-                    # g_master = spec.main_comm.is_manager()
-                    l_master = inter_comm.is_manager()
+                    # g_manager = spec.main_comm.is_manager()
+                    l_manager = inter_comm.is_manager()
 
-                    # print 'global rank: ',rank,'local rank: ',lrank,'color: ',color,'tempcolor: ',temp_color,'group: ',group,'is local master: ',l_master
+                    # print 'global rank: ',rank,'local rank: ',lrank,'color: ',color,'tempcolor: ',temp_color,'group: ',group,'is local manager: ',l_manager
                     laverages = []
                     AVE_LIST_TAG = 50
                     # Partion the average task list amoung the inter/split communicators
-                    if l_master:
+                    if l_manager:
                         laverages = multi_comm.partition(
                             avg_dict[i], func=partition.EqualStride(), involved=True
                         )
@@ -221,15 +221,15 @@ class PyAverager(object):
                     laverages = avg_dict[i]
                     inter_comm = spec.main_comm
                     lsize = inter_comm.get_size()
-                    # g_master = spec.main_comm.is_manager()
-                    l_master = inter_comm.is_manager()
+                    # g_manager = spec.main_comm.is_manager()
+                    l_manager = inter_comm.is_manager()
 
                 # Partition the variable list between the tasks of each communicator
                 if lsize > 1 and spec.serial is False:
                     lvar_list = inter_comm.partition(
                         var_list, func=partition.EqualStride(), involved=False
                     )
-                    if l_master:
+                    if l_manager:
                         lvar_list = var_list
                 else:
                     lvar_list = var_list
@@ -243,7 +243,7 @@ class PyAverager(object):
                 #
                 # ==============================================================================
 
-                if spec.serial or g_master:
+                if spec.serial or g_manager:
                     if not os.path.exists(spec.out_directory):
                         os.makedirs(spec.out_directory)
                 spec.main_comm.sync()
@@ -328,7 +328,7 @@ class PyAverager(object):
                         else:
                             l_collapse_dim = ''
                         all_files_vars, new_file = climFileIO.define_ave_file(
-                            l_master,
+                            l_manager,
                             spec.serial,
                             var_list,
                             lvar_list,
@@ -385,7 +385,7 @@ class PyAverager(object):
                         # Open all of the files that this rank will need for this average (for time slice files)
                         if (
                             (spec.hist_type == 'slice' or '__d' in ave_descr)
-                            and (spec.serial or not l_master)
+                            and (spec.serial or not l_manager)
                             and len(lvar_list) > 0
                         ):
                             file_dict = []
@@ -410,7 +410,7 @@ class PyAverager(object):
                         ) and len(lvar_list) > 0:
                             file_dict = []
                             open_list = []
-                            if spec.serial or not l_master:
+                            if spec.serial or not l_manager:
                                 # Open files
                                 file_dict, open_list = climFileIO.open_all_files(
                                     hist_dict,
@@ -432,7 +432,7 @@ class PyAverager(object):
                                 var = orig_var
                             # Open all of the files that this rank will need for this average (for time series files)
                             if (spec.hist_type == 'series' and '__d' not in ave_descr) and (
-                                spec.serial or not l_master
+                                spec.serial or not l_manager
                             ):
                                 if (
                                     'mavg' not in ave_descr
@@ -486,9 +486,9 @@ class PyAverager(object):
                                     timer,
                                     collapse_dim=spec.collapse_dim,
                                 )
-                            # Else (not concat), each slave will compute averages and each master will collect and write
+                            # Else (not concat), each worker will compute averages and each manager will collect and write
                             else:
-                                if spec.serial or not l_master:
+                                if spec.serial or not l_manager:
                                     # mean_diff_rsm file
                                     if 'hor.meanyr' in ave_descr and '__meta' not in orig_var:
                                         obs_file = spec.obs_dir + '/' + spec.obs_file
@@ -565,17 +565,17 @@ class PyAverager(object):
                                         # Close all open files (for time series files)
                                         if (
                                             spec.hist_type == 'series' and '__d' not in ave_descr
-                                        ) and (spec.serial or not l_master):
+                                        ) and (spec.serial or not l_manager):
                                             climFileIO.close_all_files(open_list)
 
-                                        # Pass the average results to master rank for writing
+                                        # Pass the average results to manager rank for writing
                                         if not spec.serial:
                                             timer.start('Send Average Time')
                                             inter_comm.collect(data=var, tag=VNAME_TAG)
                                             inter_comm.collect(data=var_avg_results, tag=AVE_TAG)
                                             timer.stop('Send Average Time')
 
-                                if spec.serial or l_master:
+                                if spec.serial or l_manager:
                                     # If ave_descr is hor.meanyr, there will be three variables to write for each variable.
                                     # Other wise, there will only be 1
                                     if 'hor.meanyr' in ave_descr and '__meta' not in orig_var:
@@ -625,11 +625,11 @@ class PyAverager(object):
                             or 'mons' in ave_descr
                             or '_mean' in ave_descr[0]
                         ) and len(lvar_list) > 0:
-                            if spec.serial or not l_master:
+                            if spec.serial or not l_manager:
                                 climFileIO.close_all_files(open_list)
                         elif (
                             (spec.hist_type == 'slice' or '__d' in ave_descr)
-                            and (spec.serial or not l_master)
+                            and (spec.serial or not l_manager)
                             and len(lvar_list) > 0
                         ):
                             climFileIO.close_all_files(open_list)
@@ -638,11 +638,11 @@ class PyAverager(object):
                         inter_comm.sync()
 
                     # Close the newly created average file
-                    if spec.serial or l_master:
+                    if spec.serial or l_manager:
                         new_file.close()
 
                     # If needed, stitch spatially split files together.
-                    if spec.serial or l_master:
+                    if spec.serial or l_manager:
                         if len(spec.split_files.split(',')) > 1:
                             fn1 = spec.out_directory + '/nh_' + outfile_name
                             fn2 = spec.out_directory + '/sh_' + outfile_name
@@ -677,7 +677,7 @@ class PyAverager(object):
         timer.stop('Total Time')
         my_times = spec.main_comm.allreduce(timer.get_all_times(), 'max')
 
-        if g_master:
+        if g_manager:
             print('==============================================')
             print('COMPLETED SUCCESSFULLY')
             print(my_times)
