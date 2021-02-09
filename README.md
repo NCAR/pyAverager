@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3894862.svg)](https://doi.org/10.5281/zenodo.3894862)
 
-September 6, 2018
+February 9, 2021
 
 
 # PyAverager
@@ -10,7 +10,7 @@ A package used for computing averages from climate model output.
 
 Authors:  Sheri Mickelson, Kevin Paul, and John Dennis
 
-Version:  0.9.16
+Version:  0.9.17
 
 Copyright:  Contained within LICENSE.txt
 

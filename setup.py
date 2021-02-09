@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='PyAverager',
-    version='0.9.16',
+    version='0.9.17',
     description='Parallel Python Averager for Climate Data',
     author='Sheri Mickelson',
     author_email='mickelso@ucar.edu',
