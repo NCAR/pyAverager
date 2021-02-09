@@ -801,7 +801,7 @@ def time_concat(
             if '__meta' in var:
                 parts = var.split('__')
                 var = parts[0]
-            # If worker, get slice and pass to manager 
+            # If worker, get slice and pass to manager
             if not simplecomm.is_manager() or serial:
                 if 'zonalavg' in ave_type:
                     if collapse_dim is not None:
