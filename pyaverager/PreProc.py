@@ -163,7 +163,7 @@ class PreProc(object):
         local_var_list = main_comm.partition(
             global_var_list, func=partition.EqualLength(), involved=False
         )
-        # If master/root, give it the full variable list
+        # If manager/root, give it the full variable list
         if main_comm.is_manager() or spec.serial:
             local_var_list = global_var_list
 
@@ -309,7 +309,7 @@ class PreProc(object):
                             # Sum the variable
                             var_sum = self.get_sum(masked_var, variables[var_name], var_name)
 
-                        # Pass the average results to master rank for writing
+                        # Pass the average results to manager rank for writing
                         var_shape = var_sum.shape
                         var_dtype = var_sum.dtype
                         md_message = {

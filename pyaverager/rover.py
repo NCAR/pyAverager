@@ -313,7 +313,7 @@ def set_slices_and_vars_time_series(
                         'pattern': file_pattern,
                         'suffix': suffix,
                     }
-        # Add the year's info to the master dictionary
+        # Add the year's info to the manager dictionary
         hist_dict[yr] = year_dict
 
     # Now we just need to create a meta_list.

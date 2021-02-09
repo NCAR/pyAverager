@@ -353,7 +353,7 @@ def get_var_info(my_file, var_name, ave_descr, collapse_dim=''):
 
 
 def define_ave_file(
-    l_master,
+    l_manager,
     serial,
     var_list,
     lvar_list,
@@ -382,7 +382,7 @@ def define_ave_file(
     """
     The function controls the defining of a new NetCDF file.
 
-    @param l_master      Boolean, if this task is a local master.
+    @param l_manager      Boolean, if this task is a local manager.
 
     @param serial        Boolean, if we are running in serial mode.
 
@@ -442,7 +442,7 @@ def define_ave_file(
     yr = int(ave_descr[1])
 
     # Open/create the average files.  Then get variable information from other procs and add these variables to the files.
-    if serial or l_master:
+    if serial or l_manager:
         # We need to retreive coord data from an original time series file.  Since particular file doesn't matter, just open the first one in the variable list
         first_fn = var_list[0]
         if '__meta' in first_fn:
@@ -504,7 +504,7 @@ def define_ave_file(
     # Have each rank open it's own variable file(s), retreive variable info, and send to root to create variable
     if (
         (hist_type == 'slice' or ('__d' in ave_descr))
-        and (serial or not l_master)
+        and (serial or not l_manager)
         and len(lvar_list) > 0
     ):  # Open just once because all vars are located in one file
         f = open_file(lvar_list[0], hist_dict[yr][month], split_name)
@@ -540,7 +540,7 @@ def define_ave_file(
             lookup_vn = var_fn
             write_var = orig_var_name
         if hist_type == 'series' and (
-            serial or not l_master
+            serial or not l_manager
         ):  # Open each file because there is only one series variable per file
             f = open_file(var_fn, hist_dict[yr][month], split_name)
         if '__meta' in orig_var_name:
@@ -548,7 +548,7 @@ def define_ave_file(
             lookup_vn = parts[0]
             write_var = parts[0]
 
-        if serial or not l_master:
+        if serial or not l_manager:
             type_code, dimnames, attr = get_var_info(f, lookup_vn, ave_descr, collapse_dim)
             if pre_proc_attr is not None and 'time' not in unit_var:
                 pre_proc_attr['units'] = pre_proc_variables[unit_var]['units']
@@ -562,7 +562,7 @@ def define_ave_file(
             }
             if not serial:
                 simplecomm.collect(data=var_info, tag=VAR_INFO_TAG)
-        if serial or l_master:
+        if serial or l_manager:
             if not serial:
                 r_rank, var_info = simplecomm.collect(tag=VAR_INFO_TAG)
             temp = {}
@@ -586,11 +586,11 @@ def define_ave_file(
                     var_info['attr'],
                     new_file,
                 )
-        if hist_type == 'series' and (serial or not l_master):
+        if hist_type == 'series' and (serial or not l_manager):
             f.close()
-    if hist_type == 'slice' and (serial or not l_master) and len(lvar_list) > 0:
+    if hist_type == 'slice' and (serial or not l_manager) and len(lvar_list) > 0:
         f.close()
-    if serial or l_master:
+    if serial or l_manager:
         all_files_vars.update(new_file.variables)
         # All vars are defined, Write all meta vars to the files
         for mv in meta_list:

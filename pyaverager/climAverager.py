@@ -801,7 +801,7 @@ def time_concat(
             if '__meta' in var:
                 parts = var.split('__')
                 var = parts[0]
-            # If slave, get slice and pass to master
+            # If worker, get slice and pass to manager
             if not simplecomm.is_manager() or serial:
                 if 'zonalavg' in ave_type:
                     if collapse_dim is not None:
@@ -834,7 +834,7 @@ def time_concat(
                     simplecomm.collect(data=var_val, tag=CONCAT_VAL_TAG)
                     timer.stop('Send Average Time')
             if simplecomm.is_manager() or serial:
-                # If master, recv slice and write to file
+                # If manager, recv slice and write to file
                 if not serial:
                     timer.start('Recv Average Time')
                     r_rank, results = simplecomm.collect(tag=CONCAT_TAG)

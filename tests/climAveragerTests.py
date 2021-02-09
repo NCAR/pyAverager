@@ -1984,7 +1984,7 @@ def test_time_concat(var, hist_dict, months_to_average, years, ave_type, ave_inf
     split = False
     serial = True
 
-    l_master = True
+    l_manager = True
     serial = True
     var_list = [
         'var01',
@@ -2037,7 +2037,7 @@ def test_time_concat(var, hist_dict, months_to_average, years, ave_type, ave_inf
     )
 
     all_files_vars, new_file = climFileIO.define_ave_file(
-        l_master,
+        l_manager,
         serial,
         var_list,
         lvar_list,
